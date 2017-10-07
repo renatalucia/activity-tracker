@@ -13,6 +13,5 @@ Clustring and Retrieval:
 * Scripts:
 http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/clustering/users_clusters_visualize.html
 * Samples:
-http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/clustering/report_1.html
-
-http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/clustering/report_2.html
+	* http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/clustering/report_1.html
+	* http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/cluster_charts/clustering/report_2.pdf
