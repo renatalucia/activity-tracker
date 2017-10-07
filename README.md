@@ -8,6 +8,9 @@ http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/bl
 http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/weights_filter.html
 * Activities:
 http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/tracker_filter.html
+* Bmi, Steps correlation:
+http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps_correlation.html
+
 
 Clustring and Retrieval:
 * Scripts:
