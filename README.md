@@ -8,7 +8,7 @@ Data Exploration:
 
 * [Activities](http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/tracker_filter.html): Visualize statistical profile of activity data, filter noisy steps counts based on threshold, steps _vs_ distance ratio, and steps _vs_ calories ratio.
 
-* [Bmi, Steps correlation](http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps_correlation.html): Visualize bmi _vs_ steps correlation considering all users, and inidividual users.
+* [Bmi, Steps correlation](http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps_correlation.html): Visualize correlation between bmi and number of steps considering all users, and inidividual users.
 
 
 
