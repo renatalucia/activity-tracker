@@ -1,0 +1,108 @@
+%%This is a template for PH1140 documents for RHUL physics. It is based on IOP journal formatting, but has been brought up-to-date with biblatex by ACK (2017). 
+
+
+\documentclass[12pt]{iopart}
+\usepackage{graphicx} %includes figure handling
+\usepackage{textcomp}
+\usepackage{hyperref}
+\usepackage[sorting=none]{biblatex} %includes bibliography tools
+\defbibheading{iophead}[\refname]{\section*{#1}}% don't touch this!
+
+\bibliography{references.bib} %this is the name of the file where the biblatex entries are written down
+
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+ 
+\begin{document}
+
+\title[Renata Rego]{Body Mass Index and Number of Steps Analysis from Activity Tracker Data}
+
+\author{Renata Rego \\ \today} %\today can be changed to a fixed date if desired
+
+\begin{abstract}
+The general goal of this project is to analyze steps and body weight data from users of activity trackers, and to provide coaching insights for users to reach their fitness goals.
+The database used in this project was kindly provided by \href{http://www.medisana.de/}{Medisana\textregistered} and consists on user data stored on their 
+\href{https://cloud.vitadock.com/}{Vitadock} Online Platform.
+
+\end{abstract}
+
+\section{Introduction}
+
+Obesity and sedentary lifestyle are known to belong together. The question we want to  investigate in this project is how daily steps, measured with a simple, wide accessible equipment, are related to the increase or decrease of the body mass index (vmi), and wether it is possible to provide users insights of how increasing their daily steps could help with decreasing their bmi (i.e, loosing weight). The users population considered in this project doesn't have any restriction of  sex, age, height, etc. Statistics about the available data, such as age range, amount of female and male users, etc. will be presented in the Exploratory Data Analysis.
+
+\section{Methods}
+
+\subsection{Data Acquisition}
+
+The  Vitadock database schema is available at the \href{https://github.com/Medisana/vitadock-api/wiki/DATA-MODEL-(all-modules)}{Vitadock API repository} .
+The data was kindly provided by \href{http://www.medisana.de/}{Medisana\textregistered} for this project, and due to privacy reasons it cannot be publicly shared.
+The tables and fields of interest for this project are: 
+\begin{itemize}
+\item user settings: user\_id, sex, height, birthday
+\item targetscale: user\_id, measurement\_date, body\_weight, bmi
+\item targetscale settings: user\_id, measure\_unit
+\item tracker stats: user\_id, measurement\_date, steps, calories, distance
+\end{itemize} 
+The data of interest were initially read from a MySQL database and saved as json files (one file per table listed above).
+We observed that some users have several entries in the user\_settings table, i.e., there are multiple entries of user\_settings with the same value for the field user\_id,
+which was expected to be unique.
+The explanation for this is that the database keeps a history of all changes of each particular user settings.
+In this project, we took the most recently updated setting for each user with multiple entries. 
+This is reasonable because users usually fill in few a required information when registering their account, and as they get interested in the device they update their accounts, adding new data, or updating values inserted automatically by default. 
+\\ \\
+Once we read the data from the relational database into json files, we were ready to start the next steps of the project: data exploration and data preparation.
+
+\subsection{Data Exploration and Data Preparation}
+
+The main data exploration  tasks performed in this project were:
+\begin{itemize}
+\item Getting an overview of the data. For example, number of entries available, number of null values, possible values for the attributes (domain);
+\item Analyzing the statistical profile of data: ex. max, min, mean values, histograms, boxplots, etc.
+\item Analysing the correlations between bmi and average number of daily steps.
+\end{itemize}
+During the  statistical analysis we could also identify outliers and noisy values, and perform the necessary operations to clean the data. \\ \\
+Data Preparation activities includes the data cleaning mentioned above and a couple of other transformations, as for example: 
+\begin{itemize}
+\item converting birthday to age;
+\item filtering weight unit measures: for the sake of simplicity and the considering that the great majority of entries are in kilos, we selected only weights given in kilos;
+\item recomputing bmi, in order to fill missing values or make sure it is coherent with the user's weight and height.
+\end{itemize}
+
+The findings of the exploratory data analysis are presented in the links below:
+
+\begin{itemize}
+\item  \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/users_filter.html}{Users}: Visualize statistical profile of user data, filter noisy data.
+ 
+ 
+\item  \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/weights_filter.html}{Weights}: Visualize statistical profile of weight data, filter noisy data, filter by metric (kilos), handle multiple measure at the same timestamp, compute bmi.
+
+\item  \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/tracker_filter.html}{Activities}: Visualize statistical profile of activity data, filter noisy steps counts based on threshold, steps \textit{vs} distance ratio, and steps \textit{vs} calories ratio.
+
+\item  \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps_correlation.html}{Bmi, Steps correlation}: Visualize correlation between bmi and number of steps considering all users, and inidividual users.
+\end{itemize}
+
+
+%\subsubsection{Users data}
+
+%\subsubsection{Weight Data}
+
+%\subsubsection{Steps Data}
+
+%\subsubsection{BMI Steps Correlation}
+
+%\subsection{Users Clustering}
+
+
+
+\subsection{Clustering}
+
+
+
+
+\section{Conclusion}
+
+
+
+\end{document}
+
