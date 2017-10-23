@@ -6,6 +6,11 @@
 \usepackage{textcomp}
 \usepackage{hyperref}
 \usepackage[sorting=none]{biblatex} %includes bibliography tools
+\usepackage{relsize}
+\usepackage{titlesec}
+
+
+
 \defbibheading{iophead}[\refname]{\section*{#1}}% don't touch this!
 
 \bibliography{references.bib} %this is the name of the file where the biblatex entries are written down
@@ -13,6 +18,10 @@
 \hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
 \usepackage{helvet}
 \renewcommand{\familydefault}{\sfdefault}
+
+\mathchardef\mhyphen="2D
+
+
  
 \begin{document}
 
@@ -59,13 +68,13 @@ The main data exploration  tasks performed in this project were:
 \begin{itemize}
 \item Getting an overview of the data. For example, number of entries available, number of null values, possible values for the attributes (domain);
 \item Analyzing the statistical profile of data: ex. max, min, mean values, histograms, boxplots, etc.
-\item Analysing the correlations between bmi and average number of daily steps.
+\item Analysing the correlations between bmi and number of steps.
 \end{itemize}
 During the  statistical analysis we could also identify outliers and noisy values, and perform the necessary operations to clean the data. \\ \\
 Data Preparation activities includes the data cleaning mentioned above and a couple of other transformations, as for example: 
 \begin{itemize}
 \item converting birthday to age;
-\item filtering weight unit measures: for the sake of simplicity and the considering that the great majority of entries are in kilos, we selected only weights given in kilos;
+\item filtering weight unit measures:  considering that the great majority of entries are in kilos, we selected only weights measured in kilos;
 \item recomputing bmi, in order to fill missing values or make sure it is coherent with the user's weight and height.
 \end{itemize}
 
@@ -89,15 +98,130 @@ The findings of the exploratory data analysis are presented in the links below:
 
 %\subsubsection{Steps Data}
 
-%\subsubsection{BMI Steps Correlation}
-
-%\subsection{Users Clustering}
+\subsubsection{BMI Steps Correlation}
 
 
+\hfill \break
+
+In order to investigate the relationship between number of steps and bmi value the following analysis were performed:
+
+\begin{itemize}
+\item Correlation Analysis:
+The Pearson correlation coefficient ($corr$) is computed to measure the strength and direction of a linear relationship between two variables, which the following interpretation for the values of $corr$:
+
+\begin{list}{$\circ$}{} \smaller
+\item $-1.0$: Perfect negative linear relationship
+\item $-0.7$: Strong negative linear relationship
+\item $-0.3$: Weak negative linear relationship
+\item $ 0.0$: No linear relationship
+\item $ 0.3$: Weak positive linear relationship
+\item $ 0.7$: Strong positive linear relationship
+\item $ 1.0$: Perfect positive linear relationship
+\end{list}
+
+\item Cross correlation Analysis
+
+
+\item Linear Regression Analysis:
+
+A simple linear regression model, defined as $bmi = a +  b \cdot steps$ was fitted to the data. 
+The model coefficients were estimating using ordinary least squares.
+\\
+
+A 95\% confidence interval was computed for the model coefficients, which is interpreted as: if the population from which this sample was drawn was sampled 100 times, approximately those confidence intervals would contain the "true" coefficient in 95 of theses samples.
+\\
+
+A hypothesis test was performed with the following conventional hypothesis:
+
+\begin{list}{$\circ$}{} 
+\item Null hypothesis: There is no relationship bewteen bmi and steps ($b = 0$)
+\item Alternative hypothesis: There is a relationship bewteen bmi and steps ($b \neq 0$)
+\end{list}
+The Null Hypothesis is rejected if the 95\% confidence interval does not include zero. Otherwise the test fails to reject the null hypothesis.
+In order to test the Hypothesis the p-value is computed, which represents the probability that the coefficient is actually zero.
+The p-values are interpreted as follows: 
+\begin{list}{$\circ$}{} 
+\item $p\mhyphen value <=  0.05$ means that the 95\% confidence interval does not include zero, and the test rejects the null Hypothesis (indicating a relationship between steps and bmi)
+\item $p\mhyphen value > 0.05$ means that the 95\% confidence interval includes zero, and the test fails to reject the null Hypothesis (indicating that there is no relationship between steps and bmi)
+\end{list}
+ 
+\end{itemize}
+
+A summary of the above mentioned analysis is presented the following.
+
+\begin{enumerate}
+\item Steps and bmi values of all users:
+The goal is to investigate if the number of steps is in general correlated to the bmi of the users. In other words, is it true that users who walks more steps have lower bmi?
+The investigation considered:
+
+\begin{itemize}
+\item Correlation Analysis:
+ The Pearson correlation coefficient computed was $corr = -0.1068$, indicating a weak but yet negative correlation between the number of steps and the bmi value.
+
+\item Linear Regression Analysis:
+The hypothesis test rejected the null hypothesis with $p\mhyphen value = 0.0 $, suggesting that there is a relationship between steps and bmi.
+\end{itemize}
+
+
+\item Steps and bmi values of individual users:
+The goal is to investigate if the number of steps of an individual user is correlated to their own bmi. In other words, is it true that increasing or decreasing the number of steps affects the bmi of a given user? And how is it affected?
+
+\begin{itemize}
+\item Correlation Analysis:  The Pearson correlation coefficient was computed for each user, who had as least 60 bmi/steps registers. A summary of the results is presentes below:
+\begin{list}{$\circ$}{} 
+\item The median, and mean value of the correlations are respectively  $-0.0026$ and $-0.0174$
+\item  Only $3$ users ($0.08\%$) have a strong and $206$ ($5.63\%$) users have a medium negative correlation between steps and bmi.
+\item Yet less users presented strong or medium positive correlation between steps and bmi, $2$ ($0.05\%$) and $144$ ($3.94\%$) users respectively.
+\item $25\%$ of the users has correlation smaller or equals to $-0.119$
+\item The highest negative correlation is: $-0.739$
+\item The highest negative correlation excluding outliers is $-0.4160$
+\item $25\%$ of the users has correlation greater or equals to $0.080$
+\item The highest positive correlation is $0.799$
+\item The highest positive correlation excluding outliers is $0.378$
+\end{list}
+
+
+\item Cross-correlation analysis: Since the data being investigated are time series, we also computed the cross-correlation between steps and vmi. The maximum lag defined 
+was 10. For each user we stored the smallest correlation and the lag leading this value. A summary of the correlation values found is given below: 
+\begin{list}{$\circ$}{} 
+\item The median, and mean value of the correlations are respectively  $-0.067$ and $0.078$
+\item  $5$ users ($0.14\%$) have a strong and $299$ ($8.18\%$) users have a medium negative correlation between steps and bmi.
+\item Even less users presented strong or medium positive correlation between steps and bmi, $1$ ($0.03\%$) and $43$ ($1.18\%$) users respectively.
+\item $25\%$ of the users has correlation smaller or equals to $-0.170$
+\item The highest negative correlation is: $-0.788$
+\item The highest negative correlation excluding outliers is $-0.445$
+\item $25\%$ of the users has correlation greater or equals to $0.013$
+\item The highest positive correlation is $0.736$
+\item The highest positive correlation excluding outliers is $0.288$
+\end{list}
+
+\item Linear regression analysis: 
+Data from two users were selected for the linear regression analysis. The user presented with the most negative correlation coefficient, and the second presented the most negative cross correlation coefficient (with a lag of 6).
+In both cases the hypothesis test rejected the null hypothesis with $p\mhyphen value = 5.3160eö{-118} $ for the first user, and $p\mhyphen value =  1.683eö{-30}$ for the second user. The results suggest a relationship bewteen bmi and steps for these users.
+
+\end{itemize}
+\end{enumerate}
+
+A more extensive presentation of the relationships between steps and bmi, including charts and bmi predictions from steps can be found \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps_correlation.html}{here}.
 
 \subsection{Clustering}
+The users where grouped in a total of 36 groups according to their activity lebel, bmi and age.
+\begin{itemize}\smaller
+\item age: $< 30$; $30$ to  $59$, $>=60$ years old
+\item bmi: $<18$ (underweight); $18$ to $25$ (normal); $26$ to $30$ (overweight); $>30$ (obese)
+\item activity level: $<5000$ (low active);  $5000$ to $10000$ (active); $>10000 (very active)$
+\end{itemize}
 
 
+
+\subsection{User results report}
+The last phase of the project was to provide a report for a given user showing the characteristics of their group, and how they compare to other users in the same group, through histograms and box plot charts. The bmi/steps evolution curves for a from their group (the one with lowest steps/bmi correlation) is also presented as am insight of how increasing the average number of daily steps in a month, could lead to a weight lost (bmi decrease).
+
+Take a look at two examples os such reports: 
+\begin{itemize}
+\item \href{https://github.com/renatalucia/activity-tracker/blob/master/clustering/report_1.pdf}{uset data not from the dataset}
+\item \href{https://github.com/renatalucia/activity-tracker/blob/master/clustering/report_2.pdf}{user data from the dataset}
+\end{itemize}
 
 
 \section{Conclusion}
