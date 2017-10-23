@@ -1,6 +1,8 @@
 # activity-tracker
 Data exploration and processing of activity tracker data; users clustering and users analysis.
 
+[Here you find a short description of the project](https://github.com/renatalucia/activity-tracker/blob/master/doc/report.pdf)
+
 Data Exploration:
 * [Users](http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/users_filter.html): Visualize statistical profile of user data, filter noisy data.
 
