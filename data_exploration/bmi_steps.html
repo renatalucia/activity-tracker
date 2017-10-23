@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>users_filter</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>bmi_steps</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <style type="text/css">
@@ -11775,13 +11775,16 @@ div#notebook {
 
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Counter</span>
 </pre></div>
 
 </div>
@@ -11791,7 +11794,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">IPython.core.display</span> <span class="k">as</span> <span class="nn">di</span>
@@ -11837,7 +11840,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">Markdown</span><span class="p">,</span> <span class="n">display</span>
@@ -11850,39 +11853,38 @@ div#notebook {
 </div>
 
 </div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../data/filtered/activities_filter.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">activities</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../data/filtered/weights_filter.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Understanding-Data:-Users">Understanding Data: Users<a class="anchor-link" href="#Understanding-Data:-Users">&#182;</a></h1><p>Users attributes of interest:</p>
-
-<pre><code>* Sex: Categorical (Female, Male)
-* Height: Continuous 
-* Birthday: Date</code></pre>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Overview-of-the-data">Overview of the data<a class="anchor-link" href="#Overview-of-the-data">&#182;</a></h2>
+<h1 id="Data-Overview">Data Overview<a class="anchor-link" href="#Data-Overview">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Read users </span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../data/all_users.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">users</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
-<span class="n">users</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Total umber of users: **</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Activities**&#39;</span><span class="p">)</span>
+<span class="n">activities</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -11898,8 +11900,86 @@ div#notebook {
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<p><strong>Total umber of users: </strong>387373</p>
+<p><strong>Activities</strong></p>
 
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[18]:</div>
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>calories</th>
+      <th>distance</th>
+      <th>measurement_date</th>
+      <th>steps</th>
+      <th>user_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>2015-08-12 02:00:00</td>
+      <td>0</td>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>277.91</td>
+      <td>5.90</td>
+      <td>2015-08-24 02:00:00</td>
+      <td>7971</td>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>607.50</td>
+      <td>12.97</td>
+      <td>2015-08-25 02:00:00</td>
+      <td>17452</td>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>681.24</td>
+      <td>14.30</td>
+      <td>2015-08-26 02:00:00</td>
+      <td>19201</td>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>2015-08-27 02:00:00</td>
+      <td>0</td>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 </div>
 
 </div>
@@ -11910,15 +11990,11 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Group user settings by user_id. Check if each group length is greater than 1</span>
-<span class="n">not_unique</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">g</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
-<span class="c1"># Keep only groups with more than one entry</span>
-<span class="n">not_unique</span> <span class="o">=</span> <span class="n">not_unique</span><span class="p">[</span><span class="n">not_unique</span><span class="p">]</span>
-<span class="c1"># Number of not unique entries</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Number of non unique user_id: **</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">not_unique</span><span class="p">)))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Weights**&#39;</span><span class="p">)</span>
+<span class="n">weights</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -11934,8 +12010,86 @@ div#notebook {
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<p><strong>Number of non unique user_id: </strong>2845</p>
+<p><strong>Weights</strong></p>
 
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[19]:</div>
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>bmi</th>
+      <th>body_weight</th>
+      <th>measurement_date</th>
+      <th>user_id</th>
+      <th>height</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>28.900757</td>
+      <td>85.5</td>
+      <td>2017-01-07 17:37:12</td>
+      <td>00004dca-f8ca-4536-ad74-46202452e032</td>
+      <td>172.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>27.717685</td>
+      <td>82.0</td>
+      <td>2017-01-07 18:10:48</td>
+      <td>00004dca-f8ca-4536-ad74-46202452e032</td>
+      <td>172.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>28.866955</td>
+      <td>85.4</td>
+      <td>2017-01-07 18:12:19</td>
+      <td>00004dca-f8ca-4536-ad74-46202452e032</td>
+      <td>172.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>28.968515</td>
+      <td>101.3</td>
+      <td>2017-03-26 14:40:55</td>
+      <td>0000767c-089c-415f-a3ea-10a83eff7115</td>
+      <td>187.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>29.025708</td>
+      <td>101.5</td>
+      <td>2017-03-26 14:57:47</td>
+      <td>0000767c-089c-415f-a3ea-10a83eff7115</td>
+      <td>187.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 </div>
 
 </div>
@@ -11943,14 +12097,48 @@ div#notebook {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Data-Preparation">Data Preparation<a class="anchor-link" href="#Data-Preparation">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Weights">Weights<a class="anchor-link" href="#Weights">&#182;</a></h2>
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Are there null values in users dataframe?</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Are there null values? **</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">any</span><span class="p">()))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Add fields**: year, month, day&#39;</span><span class="p">)</span>
+<span class="n">weights</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="s1">&#39;measurement_date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+<span class="n">weights</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="s1">&#39;measurement_date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">month</span><span class="p">)</span>
+<span class="n">weights</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="s1">&#39;measurement_date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Filter weight columns**: user_id, year, month, bmi&#39;</span><span class="p">)</span>
+<span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[[</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">,</span> <span class="s1">&#39;bmi&#39;</span><span class="p">]]</span>
+
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**In case of multiple bmi measures in the same day, take the mean value**&#39;</span><span class="p">)</span>
+
+<span class="n">weights</span><span class="p">[</span><span class="s1">&#39;bmi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+    <span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">])[</span><span class="s1">&#39;bmi&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">)</span>
+
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Remove duplicates**&#39;</span><span class="p">)</span>
+<span class="n">len_before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+<span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Number of duplicated entries removed: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">len_before</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)))</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Remaining number of weight entries: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)))</span>
 </pre></div>
 
 </div>
@@ -11966,7 +12154,66 @@ div#notebook {
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<p><strong>Are there null values? </strong>False</p>
+<p><strong>Add fields</strong>: year, month, day</p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Filter weight columns</strong>: user_id, year, month, bmi</p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>In case of multiple bmi measures in the same day, take the mean value</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Remove duplicates</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<ul>
+<li>Number of duplicated entries removed: 2189819</li>
+</ul>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<ul>
+<li>Remaining number of weight entries: 6894745</li>
+</ul>
 
 </div>
 
@@ -11975,47 +12222,14 @@ div#notebook {
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Statistical-profile-of-the-data">Statistical profile of the data<a class="anchor-link" href="#Statistical-profile-of-the-data">&#182;</a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Attribute-'sex':-Verify-domain,-visualize-distribution">Attribute 'sex': Verify domain, visualize distribution<a class="anchor-link" href="#Attribute-'sex':-Verify-domain,-visualize-distribution">&#182;</a></h3>
-</div>
-</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Check distinct user sex values</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Domain of attribute sex should be: **[male, female]&#39;</span><span class="p">)</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Values Found:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;sex&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()))</span>
-
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Remove values out of the domain** [male, female]&#39;</span><span class="p">)</span>
-<span class="c1"># Delete user entries where sex is different from male / female</span>
-<span class="n">len_before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span>
-<span class="n">users</span> <span class="o">=</span> <span class="n">users</span><span class="p">[(</span><span class="n">users</span><span class="o">.</span><span class="n">sex</span><span class="o">==</span><span class="s1">&#39;female&#39;</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">users</span><span class="o">.</span><span class="n">sex</span><span class="o">==</span><span class="s1">&#39;male&#39;</span><span class="p">)]</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Number of users removed: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">len_before</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Number of remaining users: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)))</span>
-
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Distribution of users according to attribute </span><span class="se">\&#39;</span><span class="s1">sex</span><span class="se">\&#39;</span><span class="s1">**&#39;</span><span class="p">)</span>
-<span class="c1"># Group users by sex and plot counts</span>
-<span class="n">users_sex</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;sex&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">g</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
-<span class="n">users_sex</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">users_sex</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Prepared data overview: weights**&#39;</span><span class="p">)</span>
+<span class="n">weights</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -12031,212 +12245,88 @@ div#notebook {
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<p><strong>Domain of attribute sex should be: </strong>[male, female]</p>
+<p><strong>Prepared data overview: weights</strong></p>
 
 </div>
 
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+<div class="prompt output_prompt">Out[21]:</div>
 
 
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li><em>Values Found:</em> ['female' 'male' '???????']</li>
-</ul>
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
 
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>user_id</th>
+      <th>year</th>
+      <th>month</th>
+      <th>day</th>
+      <th>bmi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>00004dca-f8ca-4536-ad74-46202452e032</td>
+      <td>2017</td>
+      <td>1</td>
+      <td>7</td>
+      <td>28.495133</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0000767c-089c-415f-a3ea-10a83eff7115</td>
+      <td>2017</td>
+      <td>3</td>
+      <td>26</td>
+      <td>28.997112</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>0000f27e-7b4e-4cb0-875d-6d067e078291</td>
+      <td>2017</td>
+      <td>2</td>
+      <td>28</td>
+      <td>20.348837</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>0000f27e-7b4e-4cb0-875d-6d067e078291</td>
+      <td>2017</td>
+      <td>3</td>
+      <td>1</td>
+      <td>20.348837</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>0000f27e-7b4e-4cb0-875d-6d067e078291</td>
+      <td>2017</td>
+      <td>3</td>
+      <td>2</td>
+      <td>20.146025</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 </div>
 
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<p><strong>Remove values out of the domain</strong> [male, female]</p>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li>Number of users removed: 1</li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li>Number of remaining users: 387372</li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<p><strong>Distribution of users according to attribute 'sex'</strong></p>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-PhjoNJMAAAAASUVORK5CYII=
-"
->
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>sex
-female    184681
-male      202691
-dtype: int64
-</pre>
-</div>
 </div>
 
 </div>
@@ -12248,43 +12338,38 @@ dtype: int64
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Attribute-'height':-search-for-outliers,-visualize-data-variation">Attribute 'height': search for outliers, visualize data variation<a class="anchor-link" href="#Attribute-'height':-search-for-outliers,-visualize-data-variation">&#182;</a></h3>
+<h2 id="Activities">Activities<a class="anchor-link" href="#Activities">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Check max and min height </span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Original Data:**&#39;</span><span class="p">)</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Max Height:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Min Height:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Mean Height:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Standard Deviation:_ </span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Handle multiple entries of steps at the same timestamp**&#39;</span><span class="p">)</span>
 
-<span class="n">box</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">user_measurements</span> <span class="o">=</span>  <span class="n">activities</span><span class="p">[[</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span><span class="s1">&#39;measurement_date&#39;</span><span class="p">]]</span>
+<span class="n">user_measurements</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">user_measurements</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+<span class="n">measurement_counts</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">user_measurements</span><span class="p">))</span>
+<span class="n">duplicated_measurements</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">measurement_counts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">max_duplicated_count</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">measurement_counts</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">user_id</span> <span class="o">=</span> <span class="n">max_duplicated_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">measurement_date</span> <span class="o">=</span> <span class="n">max_duplicated_count</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-<span class="n">outliers</span> <span class="o">=</span> <span class="n">box</span><span class="p">[</span><span class="s2">&quot;fliers&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_data</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Sample of multiple measurements for same user and dame timestamp**&#39;</span><span class="p">)</span>
+<span class="n">di</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">activities</span><span class="p">[(</span><span class="n">activities</span><span class="o">.</span><span class="n">user_id</span><span class="o">==</span><span class="n">user_id</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">activities</span><span class="o">.</span><span class="n">measurement_date</span><span class="o">==</span><span class="n">measurement_date</span><span class="p">)])</span>
 
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Remove height outliers**&#39;</span><span class="p">)</span>
-<span class="n">len_before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span>
-<span class="n">users</span> <span class="o">=</span> <span class="n">users</span><span class="p">[</span><span class="o">-</span><span class="n">users</span><span class="o">.</span><span class="n">height</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">outliers</span><span class="p">)]</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Number of outliers removed: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">len_before</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Number of users after outliers removal: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)))</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**In case of multiple steps measures at the same timestamp, take the max value**&#39;</span><span class="p">)</span>
+<span class="n">activities</span><span class="p">[</span><span class="s1">&#39;steps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">activities</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+    <span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span> <span class="s1">&#39;measurement_date&#39;</span><span class="p">])[</span><span class="s1">&#39;steps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s1">&#39;max&#39;</span><span class="p">)</span>
 
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Remove duplicates**&#39;</span><span class="p">)</span>
+<span class="n">len_before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">activities</span><span class="p">)</span>
+<span class="n">activities</span> <span class="o">=</span> <span class="n">activities</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
 
-
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Filtered Data:**&#39;</span><span class="p">)</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Max Height:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Min Height:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Mean Height:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Standard Deviation:_ </span><span class="si">{}</span><span class="s1"> &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()))</span>
-
-<span class="n">box</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Number of duplicated entries removed: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">len_before</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">activities</span><span class="p">)))</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Remaining number of activity entries: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">activities</span><span class="p">)))</span>
 </pre></div>
 
 </div>
@@ -12300,7 +12385,262 @@ dtype: int64
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<p><strong>Original Data:</strong></p>
+<p><strong>Handle multiple entries of steps at the same timestamp</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Sample of multiple measurements for same user and dame timestamp</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_html rendered_html output_subarea ">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>calories</th>
+      <th>distance</th>
+      <th>measurement_date</th>
+      <th>steps</th>
+      <th>user_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>7427495</th>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>0</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427496</th>
+      <td>94.06</td>
+      <td>1.67</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>2285</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427497</th>
+      <td>135.01</td>
+      <td>2.41</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>3286</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427498</th>
+      <td>167.30</td>
+      <td>3.03</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>4151</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427499</th>
+      <td>177.74</td>
+      <td>3.24</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>4444</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427500</th>
+      <td>246.97</td>
+      <td>4.45</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>6086</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427501</th>
+      <td>256.44</td>
+      <td>4.60</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>6297</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427502</th>
+      <td>286.78</td>
+      <td>5.13</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>7010</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427503</th>
+      <td>315.61</td>
+      <td>5.66</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>7745</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427504</th>
+      <td>315.61</td>
+      <td>5.66</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>7745</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427505</th>
+      <td>315.61</td>
+      <td>5.66</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>7745</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427506</th>
+      <td>469.85</td>
+      <td>8.58</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>11745</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427507</th>
+      <td>499.01</td>
+      <td>9.14</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>12518</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427508</th>
+      <td>563.18</td>
+      <td>10.26</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>14057</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427509</th>
+      <td>591.59</td>
+      <td>10.79</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>14804</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427510</th>
+      <td>719.60</td>
+      <td>13.07</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>17905</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427511</th>
+      <td>786.44</td>
+      <td>14.33</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>19626</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427512</th>
+      <td>821.17</td>
+      <td>14.82</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>20287</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427513</th>
+      <td>844.68</td>
+      <td>15.25</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>20872</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427514</th>
+      <td>865.65</td>
+      <td>15.65</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>21434</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427515</th>
+      <td>865.65</td>
+      <td>15.65</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>21434</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427516</th>
+      <td>865.65</td>
+      <td>15.65</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>21434</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+    <tr>
+      <th>7427517</th>
+      <td>865.65</td>
+      <td>15.65</td>
+      <td>2017-03-14 01:00:00</td>
+      <td>21434</td>
+      <td>fa40be06-619b-49d4-b745-78f1b2ce9d5d</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>In case of multiple steps measures at the same timestamp, take the max value</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Remove duplicates</strong></p>
 
 </div>
 
@@ -12312,7 +12652,7 @@ dtype: int64
 
 <div class="output_markdown rendered_html output_subarea ">
 <ul>
-<li><em>Max Height:</em> 123457000.0</li>
+<li>Number of duplicated entries removed: 3070</li>
 </ul>
 
 </div>
@@ -12325,342 +12665,157 @@ dtype: int64
 
 <div class="output_markdown rendered_html output_subarea ">
 <ul>
-<li><em>Min Height:</em> 0.0</li>
+<li>Remaining number of activity entries: 5483940</li>
 </ul>
 
 </div>
 
 </div>
 
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li><em>Mean Height:</em> 526.0039002509218</li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li><em>Standard Deviation:</em> 199028.28773256642 </li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-XZIaZNwlqUHGXZIaZNwlqUHGXZIaZNwlqUHGXZIaZNwlqUHGXZIaZNwlqUHGXZIaZNwlqUHGXZIa
-ZNwlqUHGXZIaZNwlqUF9xT3JziTPJDmZ5O6LrLk5yZeSHE/y+cGOKUlajnW9FiQZAR4AfhM4BTyV
-5FBVfbVrzVuAB4GdVfVckp9erYElSb31c+V+I3Cyqp6tqjPAQWD3kjUfAB6rqucAqur0YMeUJC1H
-P3HfBDzftX2qs6/b24GfSvKvSY4m+fCFPijJ3iTzSeYXFhZWNrEkqadBPVBdB/wy8NvA+4E/TfL2
-pYuqan9VTVTVxOjo6IBOLUlaquc9d+AF4Nqu7c2dfd1OAd+pqu8D30/yBHAD8LWBTClJWpZ+rtyf
-ArYmuT7JNcBtwKEla/4J2J5kXZIfB24CTgx2VElSv3peuVfVuSR3Ao8DI8CBqjqe5I7O8X1VdSLJ
-Z4GngfPAw1V1bDUHlyRdXKpqKCeemJio+fn5oZxbktaqJEeraqLXOr+hKkkNMu6S1CDjLkkNMu6S
-1CDjLkkNMu6S1CDjLkkNMu6S1CDjLkkNMu6S1CDjLkkNMu6S1CDjLkkNMu6S1CDjLkkNMu6S1CDj
-LkkNMu6S1CDjLkkNMu6S1CDjLkkNMu6S1CDjLkkN6ivuSXYmeSbJySR3X2LdryQ5l+T3BzeiJGm5
-esY9yQjwALAL2AbsSbLtIuv+AvjcoIeUJC1PP1fuNwInq+rZqjoDHAR2X2DdFPAPwOkBzidJWoF+
-4r4JeL5r+1Rn36uSbAJ+D3joUh+UZG+S+STzCwsLy51VktSnQT1Q/Uvgrqo6f6lFVbW/qiaqamJ0
-dHRAp5YkLbWujzUvANd2bW/u7Os2ARxMArARuDXJuar6x4FMKUlaln7i/hSwNcn1LEb9NuAD3Quq
-6vpX/k7yKPAvhl2Shqdn3KvqXJI7gceBEeBAVR1Pckfn+L5VnlGStEz9XLlTVYeBw0v2XTDqVfWR
-yx9LknQ5/IaqJDXIuEtSg4y7JDXIuEtSg4y7JDXIuEtSg4y7JDXIuEtSg4y7JDXIuEtSg4y7JDXI
-uEtSg4y7JDXIuEtSg4y7JDXIuEtSg4y7JDXIuEtSg4y7JDXIuEtSg4y7JDXIuEtSg4y7JDWor7gn
-2ZnkmSQnk9x9geMfTPJ0kq8k+UKSGwY/qiSpXz3jnmQEeADYBWwD9iTZtmTZ14Ffr6pfAD4B7B/0
-oJKk/vVz5X4jcLKqnq2qM8BBYHf3gqr6QlV9t7P5JLB5sGNKkpajn7hvAp7v2j7V2Xcxk8BnLnQg
-yd4k80nmFxYW+p9SkrQsA32gmmQHi3G/60LHq2p/VU1U1cTo6OggTy1J6rKujzUvANd2bW/u7HuN
-JO8CHgZ2VdV3BjOeJGkl+rlyfwrYmuT6JNcAtwGHuhckuQ54DPhQVX1t8GNKkpaj55V7VZ1Lcifw
-ODACHKiq40nu6BzfB3wceCvwYBKAc1U1sXpjS5IuJVU1lBNPTEzU/Pz8UM4tSWtVkqP9XDz7DVVJ
-apBxl6QGGXdJapBxl6QGGXdJapBxl6QGGXdJapBxl7rMzMwwPj7OyMgI4+PjzMzMDHskaUX6+W0Z
-6XVhZmaG6elpHnnkEbZv387c3ByTk5MA7NmzZ8jTScvjN1SljvHxce6//3527Njx6r7Z2VmmpqY4
-duzYECeTfqjfb6gad6ljZGSEl156ifXr17+67+zZs2zYsIGXX355iJNJP+TPD0jLNDY2xtzc3Gv2
-zc3NMTY2NqSJpJUz7lLH9PQ0k5OTzM7OcvbsWWZnZ5mcnGR6enrYo0nL5gNVqeOVh6ZTU1OcOHGC
-sbEx7rvvPh+mak3ynrskrSHec5ek1zHjLkkNMu6S1CDjLkkNMu6S1CDjLnXxh8PUCt9zlzr84TC1
-xPfcpQ5/OExrQb/vufd15Z5kJ/BXwAjwcFX9+ZLj6Ry/FfgB8JGq+vdlTy0N0YkTJ7jlllt+ZP8b
-3uDdS609Pf+rTTICPADsArYBe5JsW7JsF7C1889e4KEBzymtuvPnzy9rv3Q16+eS5EbgZFU9W1Vn
-gIPA7iVrdgOfrkVPAm9J8rYBzypdEUeOHOHMmTMcOXJk2KNIK9bPbZlNwPNd26eAm/pYswn4Vvei
-JHtZvLLnuuuuW+6sEtz75lX76LrnTYt/fP534fOwo3vfap333u+tzufqde+Kvi1TVfuB/bD4QPVK
-nluNWMUYLj46gu6XDC60T1oL+on7C8C1XdubO/uWu0ZaE14JurSW9XPP/Slga5Lrk1wD3AYcWrLm
-EPDhLHoP8L2q+tbSD5KuZhe7OveqXWtRzyv3qjqX5E7gcRZfhTxQVceT3NE5vg84zOJrkCdZfBXy
-9tUbWVo9hlyt6Ouee1UdZjHg3fv2df1dwMcGO5okaaX8doYkNci4S1KDjLskNci4S1KDhvarkEkW
-gG8M5eRSbxuBbw97COkCfq6qRnstGlrcpatZkvl+flZVulp5W0aSGmTcJalBxl26sP3DHkC6HN5z
-l6QGeeUuSQ0y7pLUIOMudUlyIMnpJMeGPYt0OYy79FqPAjuHPYR0uYy71KWqngBeHPYc0uUy7pLU
-IOMuSQ0y7pLUIOMuSQ0y7lKXJDPAF4F3JDmVZHLYM0kr4c8PSFKDvHKXpAYZd0lqkHGXpAYZd0lq
-kHGXpAYZd0lqkHGXpAb9P35E6hf13Ol1AAAAAElFTkSuQmCC
-"
->
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<p><strong>Remove height outliers</strong></p>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li>Number of outliers removed: 3557</li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li>Number of users after outliers removal: 383815</li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<p><strong>Filtered Data:</strong></p>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li><em>Max Height:</em> 202.0</li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li><em>Min Height:</em> 143.0</li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li><em>Mean Height:</em> 173.15288940244648</li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li><em>Standard Deviation:</em> 9.65316567770935 </li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-Vn/B/xoAAAAASUVORK5CYII=
-"
->
-</div>
-
-</div>
-
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Attribute-'Birthday':-search-for-outliers,-visualize-data-variation">Attribute 'Birthday': search for outliers, visualize data variation<a class="anchor-link" href="#Attribute-'Birthday':-search-for-outliers,-visualize-data-variation">&#182;</a></h3>
-</div>
-</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Check users birthday year</span>
-<span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthyear&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthday&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Original Data**&#39;</span><span class="p">)</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Max birthyear:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthday&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">year</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Min birthyear:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthday&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">year</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Mean birthyear:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthday&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">year</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Standard deviation:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthday&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">year</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">()))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">year</span> <span class="o">=</span> <span class="n">max_duplicated_count</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">month</span> <span class="o">=</span> <span class="n">max_duplicated_count</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">day</span> <span class="o">=</span> <span class="n">max_duplicated_count</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">di</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">activities</span><span class="p">[(</span><span class="n">activities</span><span class="o">.</span><span class="n">user_id</span><span class="o">==</span><span class="n">user_id</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">activities</span><span class="o">.</span><span class="n">year</span><span class="o">==</span><span class="n">year</span><span class="p">)</span><span class="o">&amp;</span>
+                      <span class="p">(</span><span class="n">activities</span><span class="o">.</span><span class="n">month</span><span class="o">==</span><span class="n">month</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">activities</span><span class="o">.</span><span class="n">day</span><span class="o">==</span><span class="n">day</span><span class="p">)])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
 
 
-<span class="c1"># Boxplot of birthyears</span>
-<span class="n">box</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthyear&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+<div class="output_area">
+<div class="prompt"></div>
 
-<span class="n">outliers</span> <span class="o">=</span> <span class="n">box</span><span class="p">[</span><span class="s2">&quot;fliers&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_data</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="c1">#Remove outliers</span>
-<span class="n">len_before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Remove birthday outliers**&#39;</span><span class="p">)</span>
-<span class="n">users</span> <span class="o">=</span> <span class="n">users</span><span class="p">[</span><span class="o">-</span><span class="n">users</span><span class="o">.</span><span class="n">birthyear</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">outliers</span><span class="p">)]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;* Number of users removed: &#39;</span><span class="p">,</span> <span class="n">len_before</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;* Number of users after outliers removal: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)))</span>
+<div class="output_html rendered_html output_subarea ">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
 
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Filtered Data**&#39;</span><span class="p">)</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Max birthyear:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthday&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">year</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Min birthyear:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthday&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">year</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">()))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Mean birthyear:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthday&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">year</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()))</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* _Standard deviation:_ </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthday&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">year</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">()))</span>
+    .dataframe thead th {
+        text-align: left;
+    }
 
-<span class="n">box</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthyear&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>user_id</th>
+      <th>year</th>
+      <th>month</th>
+      <th>day</th>
+      <th>steps</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>640497</th>
+      <td>15a10631-aaa2-4b94-bd72-8eab4b375994</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>6</td>
+      <td>1671</td>
+    </tr>
+    <tr>
+      <th>640498</th>
+      <td>15a10631-aaa2-4b94-bd72-8eab4b375994</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>6</td>
+      <td>9835</td>
+    </tr>
+    <tr>
+      <th>640499</th>
+      <td>15a10631-aaa2-4b94-bd72-8eab4b375994</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>6</td>
+      <td>13591</td>
+    </tr>
+    <tr>
+      <th>640500</th>
+      <td>15a10631-aaa2-4b94-bd72-8eab4b375994</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>6</td>
+      <td>16080</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Add fields**: year, month, day&#39;</span><span class="p">)</span>
+<span class="n">activities</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">activities</span><span class="p">[</span><span class="s1">&#39;measurement_date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+<span class="n">activities</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">activities</span><span class="p">[</span><span class="s1">&#39;measurement_date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">month</span><span class="p">)</span>
+<span class="n">activities</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">activities</span><span class="p">[</span><span class="s1">&#39;measurement_date&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Filter activities columns**: user_id, year, month, steps&#39;</span><span class="p">)</span>
+<span class="n">activities</span> <span class="o">=</span> <span class="n">activities</span><span class="p">[[</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">,</span> <span class="s1">&#39;steps&#39;</span><span class="p">]]</span>
+
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Remove duplicates**&#39;</span><span class="p">)</span>
+<span class="n">len_before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">activities</span><span class="p">)</span>
+<span class="n">activities</span> <span class="o">=</span> <span class="n">activities</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Number of duplicated entries removed: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">len_before</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">activities</span><span class="p">)))</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Remaining number of activity entries: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">activities</span><span class="p">)))</span>
+
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Handle multiple entries of steps at the same day**&#39;</span><span class="p">)</span>
+<span class="n">user_measurements</span> <span class="o">=</span>  <span class="n">activities</span><span class="p">[[</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span><span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">]]</span>
+<span class="n">user_measurements</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">user_measurements</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+<span class="n">measurement_counts</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">user_measurements</span><span class="p">))</span>
+<span class="n">duplicated_measurements</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">measurement_counts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">max_duplicated_count</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">measurement_counts</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">user_id</span> <span class="o">=</span> <span class="n">max_duplicated_count</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">year</span> <span class="o">=</span> <span class="n">max_duplicated_count</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">month</span> <span class="o">=</span> <span class="n">max_duplicated_count</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">day</span> <span class="o">=</span> <span class="n">max_duplicated_count</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Sample of multiple measurements for same user and same day**&#39;</span><span class="p">)</span>
+<span class="n">di</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">activities</span><span class="p">[(</span><span class="n">activities</span><span class="o">.</span><span class="n">user_id</span><span class="o">==</span><span class="n">user_id</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">activities</span><span class="o">.</span><span class="n">year</span><span class="o">==</span><span class="n">year</span><span class="p">)</span><span class="o">&amp;</span>
+                      <span class="p">(</span><span class="n">activities</span><span class="o">.</span><span class="n">month</span><span class="o">==</span><span class="n">month</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">activities</span><span class="o">.</span><span class="n">day</span><span class="o">==</span><span class="n">day</span><span class="p">)])</span>
+
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**In case of multiple steps measures per day, take the max value**&#39;</span><span class="p">)</span>
+<span class="c1"># PS. It looks like tracker entries are progressively added during the day,</span>
+<span class="c1"># therefore we take the max.</span>
+<span class="n">activities</span><span class="p">[</span><span class="s1">&#39;steps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">activities</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+    <span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">])[</span><span class="s1">&#39;steps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s1">&#39;max&#39;</span><span class="p">)</span>
+
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Remove duplicates**&#39;</span><span class="p">)</span>
+<span class="n">len_before</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">activities</span><span class="p">)</span>
+<span class="n">activities</span> <span class="o">=</span> <span class="n">activities</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Number of duplicated entries removed: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">len_before</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">activities</span><span class="p">)))</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Remaining number of activity entries: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">activities</span><span class="p">)))</span>
 </pre></div>
 
 </div>
@@ -12676,7 +12831,29 @@ Vn/B/xoAAAAASUVORK5CYII=
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<p><strong>Original Data</strong></p>
+<p><strong>Add fields</strong>: year, month, day</p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Filter activities columns</strong>: user_id, year, month, steps</p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Remove duplicates</strong></p>
 
 </div>
 
@@ -12688,7 +12865,7 @@ Vn/B/xoAAAAASUVORK5CYII=
 
 <div class="output_markdown rendered_html output_subarea ">
 <ul>
-<li><em>Max birthyear:</em> 2070</li>
+<li>Number of duplicated entries removed: 27625</li>
 </ul>
 
 </div>
@@ -12701,7 +12878,134 @@ Vn/B/xoAAAAASUVORK5CYII=
 
 <div class="output_markdown rendered_html output_subarea ">
 <ul>
-<li><em>Min birthyear:</em> 1</li>
+<li>Remaining number of activity entries: 5456315</li>
+</ul>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Handle multiple entries of steps at the same day</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Sample of multiple measurements for same user and same day</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_html rendered_html output_subarea ">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>user_id</th>
+      <th>year</th>
+      <th>month</th>
+      <th>day</th>
+      <th>steps</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>640497</th>
+      <td>15a10631-aaa2-4b94-bd72-8eab4b375994</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>6</td>
+      <td>1671</td>
+    </tr>
+    <tr>
+      <th>640498</th>
+      <td>15a10631-aaa2-4b94-bd72-8eab4b375994</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>6</td>
+      <td>9835</td>
+    </tr>
+    <tr>
+      <th>640499</th>
+      <td>15a10631-aaa2-4b94-bd72-8eab4b375994</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>6</td>
+      <td>13591</td>
+    </tr>
+    <tr>
+      <th>640500</th>
+      <td>15a10631-aaa2-4b94-bd72-8eab4b375994</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>6</td>
+      <td>16080</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>In case of multiple steps measures per day, take the max value</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Remove duplicates</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<ul>
+<li>Number of duplicated entries removed: 3177</li>
 </ul>
 
 </div>
@@ -12714,277 +13018,119 @@ Vn/B/xoAAAAASUVORK5CYII=
 
 <div class="output_markdown rendered_html output_subarea ">
 <ul>
-<li><em>Mean birthyear:</em> 1955.0373304847387</li>
+<li>Remaining number of activity entries: 5453138</li>
 </ul>
 
 </div>
 
 </div>
 
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li><em>Standard deviation:</em> 197.05237278214648</li>
-</ul>
-
+</div>
 </div>
 
 </div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
-AElFTkSuQmCC
-"
->
-</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Prepared data overview: activities**&#39;</span><span class="p">)</span>
+<span class="n">activities</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
 
 <div class="output_area">
 <div class="prompt"></div>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<p><strong>Remove birthday outliers</strong></p>
+<p><strong>Prepared data overview: activities</strong></p>
 
 </div>
 
 </div>
 
 <div class="output_area">
-<div class="prompt"></div>
+<div class="prompt output_prompt">Out[24]:</div>
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>* Number of users removed:  5343
-* Number of users after outliers removal: 378472
-</pre>
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>user_id</th>
+      <th>year</th>
+      <th>month</th>
+      <th>day</th>
+      <th>steps</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>12</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>24</td>
+      <td>7971</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>25</td>
+      <td>17452</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>26</td>
+      <td>19201</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>27</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
 </div>
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<p><strong>Filtered Data</strong></p>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li><em>Max birthyear:</em> 2019</li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li><em>Min birthyear:</em> 1931</li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li><em>Mean birthyear:</em> 1975.0566646938214</li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<ul>
-<li><em>Standard deviation:</em> 14.397660555528997</li>
-</ul>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYEAAAD8CAYAAACRkhiPAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
-AAALEgAACxIB0t1+/AAADodJREFUeJzt3X+s3fVdx/Hnq3ahOFbXho5gy+jMSk0nLrMnsxkzLjPF
-JsaAQZahkcUSWNOl2ZKJsoVk7B+izmDEHzRk45caDHEubE5cCM7UsDJ3i3PlllK6LJ0XOnuxJR0Y
-uh99+8f9dp5cys695/b23NvP85HcnO/9fH/cz/nj3uf9nu/33JuqQpLUpiWjnoAkaXSMgCQ1zAhI
-UsOMgCQ1zAhIUsOMgCQ1zAhIUsOMgCQ1zAhIUsOWjnoCg1x44YW1du3aUU9DkhaVPXv2vFBVqwZt
-t+AjsHbtWsbGxkY9DUlaVJIcmsl2vhwkSQ0zApLUsIERSHJJki8n2ZdkPMmHu/GVSR5N8mz3uKIb
-35xkT5K93eN7+461sRs/mOTOJJm/pyZJGmQmZwI/AD5aVRuATcCHkmwAbgEeq6p1wGPd5wAvAL9e
-VZcDHwD+uu9YdwE3Auu6jy1n5FlIkoYyMAJVdbiqnuyWvws8DawGrgLu7za7H7i62+Y/qur5bnwc
-OD/JeUkuBpZX1RM19U8MHji1jyRpNGZ1TSDJWuAdwFeBi6rqcLfqO8BFp9nlGuDJqjrBVDgm+tZN
-dGPSorJjxw6WLVtGEpYtW8aOHTtGPSVpaDOOQJILgM8CH6mq4/3rut/sa9r2bwP+CPjgbCeV5KYk
-Y0nGJicnZ7u7NG927NjBzp07uf3223n55Ze5/fbb2blzpyHQopWZ/HvJJK8D/hH4UlXd0Y09A7yn
-qg53L/X8a1Wt79atAf4F+N2qerwbuxj4clX9bPf5dd3+PzYSvV6vfJ+AFoply5Zx6aWX8uyzz1JV
-JGHdunUcOnSIV155ZdTTk34kyZ6q6g3abiZ3BwX4DPD0qQB0Ps/UhV+6x4e77d8IfBG45VQAYOra
-AnA8yabumNef2kdaLE6cOMGBAwfYtm0bL774Itu2bePAgQOcOHFi1FOThjLwTCDJu4F/A/YCJ7vh
-jzN1XeAh4M3AIeB9VXU0ya3Ax4Bn+w5zZVUdSdID7gPOBx4BdtSACXgmoIUkCe9617t4/PEf/X7D
-FVdcwVe+8hVmclYtnS0zPROY0ctBo2QEtJAkYcmSJXzqU59i27Zt7Ny5k5tvvpmTJ08aAS0oRkCa
-B0uWLGHDhg0cPHiQEydOcN555/HWt76Vffv2cfLkycEHkM6SM3ZNQNL/27x5M+Pj42zdupUXX3yR
-rVu3Mj4+zubNm0c9NWkonglInbP1V0wW+veczg0zPRNY8H9KWjpbZvvDOYk/0LXo+XKQJDXMCEhS
-w4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yA
-JDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXM
-CEhSw4yAJDXMCEhSw4yAJDXMCEhSwwZGIMklSb6cZF+S8SQf7sZXJnk0ybPd44q+fT6W5GCSZ5L8
-at/4xiR7u3V3Jsn8PC1J0kzM5EzgB8BHq2oDsAn4UJINwC3AY1W1Dnis+5xu3fuBtwFbgL9K8hPd
-se4CbgTWdR9bzuBzkSTN0sAIVNXhqnqyW/4u8DSwGrgKuL/b7H7g6m75KuDvqupEVX0LOAi8M8nF
-wPKqeqKqCnigbx9J0gjM6ppAkrXAO4CvAhdV1eFu1XeAi7rl1cB/9e020Y2t7panj0uSRmTGEUhy
-AfBZ4CNVdbx/XfebfZ2pSSW5KclYkrHJyckzdVhJ0jQzikCS1zEVgL+tqn/ohv+7e4mH7vFIN/4c
-cEnf7mu6see65enjr1JVd1dVr6p6q1atmulzkSTN0kzuDgrwGeDpqrqjb9XngQ90yx8AHu4bf3+S
-85K8hakLwP/evXR0PMmm7pjX9+0jSRqBpTPY5grgd4C9Sb7ejX0c+EPgoSQ3AIeA9wFU1XiSh4B9
-TN1Z9KGq+mG333bgPuB84JHuQ5I0Ipl6OX/h6vV6NTY2NuppSK+ShIX+/aN2JdlTVb1B2/mOYUlq
-mBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQ
-pIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYt
-HfUEpPmwcuVKjh07Nu9fJ8m8Hn/FihUcPXp0Xr+G2mYEdE46duwYVTXqaczZfEdG8uUgSWqYEZCk
-hhkBSWqYEZCkhhkBSWqYEZCkhhkBSWqYEZCkhg2MQJJ7khxJ8lTf2NuT7E6yN8kXkizvxl+X5P5u
-/OkkH+vbZ2M3fjDJnfFdMJI0cjM5E7gP2DJt7NPALVV1OfA54OZu/FrgvG58I/DBJGu7dXcBNwLr
-uo/px5QknWUDI1BVu4Dpf7zkMmBXt/wocM2pzYHXJ1kKnA98Dzie5GJgeVU9UVPv5X8AuPoMzF+S
-NAfDXhMYB67qlq8FLumW/x54GTgMfBv4k6o6CqwGJvr2n+jGJEkjNGwEtgLbk+wB3sDUb/wA7wR+
-CPw08Bbgo0l+ZrYHT3JTkrEkY5OTk0NOUZI0yFARqKr9VXVlVW0EHgS+2a36LeCfq+r7VXUEeBzo
-Ac8Ba/oOsaYbe63j311VvarqrVq1apgpSpJmYKgIJHlT97gEuBXY2a36NvDebt3rgU3A/qo6zNS1
-gU3dXUHXAw/Pce6SpDmayS2iDwK7gfVJJpLcAFyX5ACwH3geuLfb/C+BC5KMA18D7q2qb3TrtjN1
-V9FBps4cHjmjz0SSNGsD/6lMVV33Gqv+7DTbvsTUheLTHWcM+LlZzU6SNK98x7AkNcwISFLDjIAk
-NcwISFLDBl4Ylhaj+sRyuO2nRj2NOatPLB/1FHSOMwI6J+WTx5n6M1WLWxLqtlHPQucyXw6SpIYZ
-AUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlq
-mBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYZAUlqmBGQpIYtHfUEpPmSZNRTmLMVK1aM
-ego6xxkBnZOqat6/RpKz8nWk+eTLQZLUMCMgSQ0zApLUMCMgSQ0zApLUsIERSHJPkiNJnuobe3uS
-3Un2JvlCkuV9636+WzferV/WjW/sPj+Y5M6cC/fvSdIiN5MzgfuALdPGPg3cUlWXA58DbgZIshT4
-G2BbVb0NeA/w/W6fu4AbgXXdx/RjSpLOsoERqKpdwNFpw5cBu7rlR4FruuUrgW9U1X92+/5PVf0w
-ycXA8qp6oqZurH4AuPpMPAFJ0vCGvSYwDlzVLV8LXNItXwZUki8leTLJ73fjq4GJvv0nujFJ0ggN
-G4GtwPYke4A3AN/rxpcC7wZ+u3v8jSS/MtuDJ7kpyViSscnJySGnKEkaZKgIVNX+qrqyqjYCDwLf
-7FZNALuq6oWq+l/gn4BfAJ4D1vQdYk039lrHv7uqelXVW7Vq1TBTlCTNwFARSPKm7nEJcCuws1v1
-JeDyJD/ZXST+ZWBfVR0GjifZ1N0VdD3w8JxnL0mak5ncIvogsBtYn2QiyQ3AdUkOAPuB54F7Aarq
-GHAH8DXg68CTVfXF7lDbmbqr6CBTZw6PnOHnIkmapSz0v4LY6/VqbGxs1NOQXsW/IqqFLMmequoN
-2s53DEtSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXM
-CEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhS
-w4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDXMCEhSw4yAJDVsYASS3JPk
-SJKn+sbenmR3kr1JvpBk+bR93pzkpSS/1ze2sdv+YJI7k+TMPhVJ0mzN5EzgPmDLtLFPA7dU1eXA
-54Cbp62/A3hk2thdwI3Auu5j+jElSWfZwAhU1S7g6LThy4Bd3fKjwDWnViS5GvgWMN43djGwvKqe
-qKoCHgCuntvUJUlzNew1gXHgqm75WuASgCQXAH8AfHLa9quBib7PJ7oxSdIIDRuBrcD2JHuANwDf
-68ZvA/60ql6ay6SS3JRkLMnY5OTkXA4lSfoxlg6zU1XtB64ESHIZ8Gvdql8EfjPJHwNvBE4meQX4
-LLCm7xBrgOd+zPHvBu4G6PV6NcwcJUmDDRWBJG+qqiNJlgC3AjsBquqX+ra5DXipqv6i+/x4kk3A
-V4HrgT+f49wlSXM0k1tEHwR2A+uTTCS5AbguyQFgP/A8cO8MvtZ2pu4qOgh8k1ffPSRJOssydbPO
-wtXr9WpsbGzU05BeJQkL/ftH7Uqyp6p6g7bzHcOS1DAjIEkNMwKS1DAjIEkNMwKS1DAjIEkNMwKS
-1LCh3jEstaz/X2GcWvb9AlqsjIDUmcv/OZrNvgZDC4kRkDoz+eF8ut/8PRvQYmYEpCH431F1rvDC
-sDSkFStWjHoK0pwZAWlIx44dG/UUpDkzApLUMK8JSEM43YVhaTHyTEAaQhJWrlxpALToGQFpSF4T
-0LnACEhDWr9+/ainIM2ZEZBmof9awDPPPHPacWkx8cKwNEv+wNe5xDMBSWqYEZCkhhkBSWqYEZCk
-hhkBSWpYFvqdDkkmgUOjnod0GhcCL4x6EtJruLSqVg3aaMFHQFqokoxVVW/U85DmwpeDJKlhRkCS
-GmYEpOHdPeoJSHPlNQFJaphnApLUMCMgzVKSe5IcSfLUqOcizZURkGbvPmDLqCchnQlGQJqlqtoF
-HB31PKQzwQhIUsOMgCQ1zAhIUsOMgCQ1zAhIs5TkQWA3sD7JRJIbRj0naVi+Y1iSGuaZgCQ1zAhI
-UsOMgCQ1zAhIUsOMgCQ1zAhIUsOMgCQ1zAhIUsP+D8szw0OtYoaTAAAAAElFTkSuQmCC
-"
->
 </div>
 
 </div>
@@ -12998,21 +13144,22 @@ UsOMgCQ1zAhIUsOMgCQ1zAhIUsOMgCQ1zAhIUsP+D8szw0OtYoaTAAAAAElFTkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Histograms-of-filtered-data">Histograms of filtered data<a class="anchor-link" href="#Histograms-of-filtered-data">&#182;</a></h3>
+<h1 id="Merge-steps-and-bmi-data">Merge steps and bmi data<a class="anchor-link" href="#Merge-steps-and-bmi-data">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Group users by sex and plot counts</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Users sex distribution**&#39;</span><span class="p">)</span>
-<span class="n">users_sex</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;sex&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">g</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
-<span class="n">users_sex</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">users_sex</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Merge bmi and steps data, keeping only keys from the activities dataframe.**&#39;</span><span class="p">)</span>
+<span class="n">bmi_steps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">activities</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">,</span> 
+                                                          <span class="s1">&#39;month&#39;</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">])</span>
+<span class="n">bmi_steps</span> <span class="o">=</span> <span class="n">bmi_steps</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">&#39;user_id&#39;</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span><span class="p">])</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Number of merged bmi/steps entries:** </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bmi_steps</span><span class="p">)))</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Overview of bmi/steps data:**&#39;</span><span class="p">)</span>
+<span class="n">bmi_steps</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -13028,7 +13175,304 @@ UsOMgCQ1zAhIUsOMgCQ1zAhIUsOMgCQ1zAhIUsP+D8szw0OtYoaTAAAAAElFTkSuQmCC
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<p><strong>Users sex distribution</strong></p>
+<p><strong>Merge bmi and steps data, keeping only keys from the activities dataframe.</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Number of merged bmi/steps entries:</strong> 5453138</p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Overview of bmi/steps data:</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[25]:</div>
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>user_id</th>
+      <th>year</th>
+      <th>month</th>
+      <th>day</th>
+      <th>steps</th>
+      <th>bmi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>12</td>
+      <td>0</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>24</td>
+      <td>7971</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>25</td>
+      <td>17452</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>26</td>
+      <td>19201</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>000025b9-60ab-44ec-9589-edd906cbf564</td>
+      <td>2015</td>
+      <td>8</td>
+      <td>27</td>
+      <td>0</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Interpolate bmi values**&#39;</span><span class="p">)</span>
+<span class="n">bmi_steps</span><span class="p">[</span><span class="s1">&#39;bmi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bmi_steps</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">)[</span><span class="s1">&#39;bmi&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">group</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span>
+    <span class="n">group</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)))</span>
+
+<span class="n">bmi_steps</span><span class="p">[</span><span class="s1">&#39;bmi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bmi_steps</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">)[</span><span class="s1">&#39;bmi&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">group</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span>
+    <span class="n">method</span><span class="o">=</span><span class="s1">&#39;bfill&#39;</span><span class="p">))</span>
+
+<span class="n">bmi_steps</span><span class="p">[</span><span class="s1">&#39;bmi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bmi_steps</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">)[</span><span class="s1">&#39;bmi&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">group</span><span class="p">:</span> <span class="n">group</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span>
+    <span class="n">method</span><span class="o">=</span><span class="s1">&#39;ffill&#39;</span><span class="p">))</span>
+
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Remaining number of null values:&#39;</span><span class="p">)</span>
+<span class="n">bmi_steps</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Interpolate bmi values</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<ul>
+<li>Remaining number of null values:</li>
+</ul>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[26]:</div>
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>user_id          0
+year             0
+month            0
+day              0
+steps            0
+bmi        4444105
+dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Drop null values**&#39;</span><span class="p">)</span>
+<span class="n">bmi_steps</span> <span class="o">=</span> <span class="n">bmi_steps</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Remaining number of bmi/steps entries: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bmi_steps</span><span class="p">)))</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;* Remaining number of distinct user_ids: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bmi_steps</span><span class="o">.</span><span class="n">user_id</span><span class="o">.</span><span class="n">nunique</span><span class="p">()))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Drop null values</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<ul>
+<li>Remaining number of bmi/steps entries: 1009033</li>
+</ul>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<ul>
+<li>Remaining number of distinct user_ids: 13011</li>
+</ul>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Save bmi_steps data</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../data/filtered/bmi_steps.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">bmi_steps</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Histograms-of-remaining-data">Histograms of remaining data<a class="anchor-link" href="#Histograms-of-remaining-data">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Bmi Histogram</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Bmi**&#39;</span><span class="p">)</span>
+<span class="n">n</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+    <span class="nb">list</span><span class="p">(</span><span class="n">bmi_steps</span><span class="p">[</span><span class="s1">&#39;bmi&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="n">bins</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Bmi</strong></p>
 
 </div>
 
@@ -13040,122 +13484,103 @@ UsOMgCQ1zAhIUsOMgCQ1zAhIUsOMgCQ1zAhIUsP+D8szw0OtYoaTAAAAAElFTkSuQmCC
 
 
 <div class="output_png output_subarea ">
-<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAY0AAAEiCAYAAAAF7Y7qAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
-AAALEgAACxIB0t1+/AAAGXlJREFUeJzt3X+QXeV93/H3x5JDsB2wAJkSgSMocjpAXDnSCLmpPc4o
-RYrTGJwBW6Qx8pgBO1D/qD3tmKQdPFA1IYlNh7TgwYPKD9v8KNhFdcBUBY/djMuPxVURwiYsBgap
-MqyRgpw4EATf/nGfte8uK+3x7rJXYt+vmTP3ud9znnOfO7Oaj855zrknVYUkSV28ZtADkCQdOAwN
-SVJnhoYkqTNDQ5LUmaEhSerM0JAkdWZoSJI6MzQkSZ0ZGpKkzuYPegAz7YgjjqjFixcPehiSdEC5
-//77f1hVCyfb7lUXGosXL2ZoaGjQw5CkA0qSJ7ps5+kpSVJnhoYkqbNJQyPJMUm+keShJFuTfLzV
-D0uyKckj7XVBX58LkgwneTjJ6r76siRb2rrLkqTVD0pyY6vfk2RxX5917TMeSbJuJr+8JOln0+VI
-Yw/wqao6AVgJnJ/kBODTwJ1VtQS4s72nrVsLnAisAS5PMq/t6wrgHGBJW9a0+tnArqo6HrgUuKTt
-6zDgQuBkYAVwYX84SZJm16ShUVU7quo7rf0j4LvAIuBU4Jq22TXAaa19KnBDVT1fVY8Bw8CKJEcB
-h1TV3dV7iMe14/qM7utmYFU7ClkNbKqqnVW1C9jET4NGkjTLfqY5jXba6G3APcCRVbWjrfoBcGRr
-LwKe7Ou2rdUWtfb4+pg+VbUHeBY4fB/7kiQNQOfQSPIG4BbgE1W1u39dO3IY2CMAk5ybZCjJ0MjI
-yKCGIUmvep1CI8lr6QXGl6rqK638VDvlRHt9utW3A8f0dT+61ba39vj6mD5J5gOHAs/sY19jVNWV
-VbW8qpYvXDjpvSmSpCma9Oa+NrdwFfDdqvpc36qNwDrgj9vrrX31Lyf5HPCL9Ca8762qF5PsTrKS
-3umts4A/H7ev/w2cDtxVVZXkDuA/9E1+nwJcMOVvK6mTxZ/+i0EP4VXj8T/+rUEPYUZ1uSP814AP
-AFuSbG61P6AXFjclORt4AngfQFVtTXIT8BC9K6/Or6oXW7/zgKuBg4Hb2wK9ULouyTCwk97VV1TV
-ziQXA/e17S6qqp1T/K6SpGmaNDSq6i+B7GX1qr30WQ+sn6A+BJw0Qf054Iy97GsDsGGycUqSXnne
-ES5J6szQkCR1ZmhIkjozNCRJnRkakqTODA1JUmeGhiSpM0NDktSZoSFJ6szQkCR1ZmhIkjozNCRJ
-nRkakqTODA1JUmeGhiSpsy4PYdIrwCejzaxX29PRpP2VRxqSpM4MDUlSZ5OGRpINSZ5O8mBf7cYk
-m9vy+Oizw5MsTvJ3fes+39dnWZItSYaTXJYkrX5Q299wknuSLO7rsy7JI21ZN5NfXJL0s+syp3E1
-8J+Aa0cLVfX+0XaSzwLP9m3/aFUtnWA/VwDnAPcAtwFrgNuBs4FdVXV8krXAJcD7kxwGXAgsBwq4
-P8nGqtrV/etJkmbSpEcaVfUtYOdE69rRwvuA6/e1jyRHAYdU1d1VVfQC6LS2+lTgmta+GVjV9rsa
-2FRVO1tQbKIXNJKkAZnunMY7gKeq6pG+2rHt1NQ3k7yj1RYB2/q22dZqo+ueBKiqPfSOWg7vr0/Q
-Z4wk5yYZSjI0MjIyza8kSdqb6YbGmYw9ytgBvLmdnvok8OUkh0zzMyZVVVdW1fKqWr5w4cJX+uMk
-ac6acmgkmQ/8DnDjaK2qnq+qZ1r7fuBR4C3AduDovu5Htxrt9Zi+fR4KPNNfn6CPJGkApnOk8RvA
-96rqJ6edkixMMq+1jwOWAN+vqh3A7iQr23zFWcCtrdtGYPTKqNOBu9q8xx3AKUkWJFkAnNJqkqQB
-mfTqqSTXA+8CjkiyDbiwqq4C1vLyCfB3AhcleQF4CfhIVY1Oop9H70qsg+ldNXV7q18FXJdkmN6E
-+1qAqtqZ5GLgvrbdRX37kiQNwKShUVVn7qX+wQlqtwC37GX7IeCkCerPAWfspc8GYMNkY5QkzQ7v
-CJckdWZoSJI6MzQkSZ0ZGpKkzgwNSVJnhoYkqTNDQ5LUmaEhSerM0JAkdWZoSJI6MzQkSZ0ZGpKk
-zgwNSVJnhoYkqTNDQ5LUmaEhSerM0JAkdTZpaCTZkOTpJA/21T6TZHuSzW15d9+6C5IMJ3k4yeq+
-+rIkW9q6y9qzwklyUJIbW/2eJIv7+qxL8khbRp8jLkkakC5HGlcDayaoX1pVS9tyG0CSE+g94/vE
-1ufyJPPa9lcA5wBL2jK6z7OBXVV1PHApcEnb12HAhcDJwArgwiQLfuZvKEmaMZOGRlV9C9jZcX+n
-AjdU1fNV9RgwDKxIchRwSFXdXVUFXAuc1tfnmta+GVjVjkJWA5uqamdV7QI2MXF4SZJmyXTmND6a
-5IF2+mr0CGAR8GTfNttabVFrj6+P6VNVe4BngcP3sa+XSXJukqEkQyMjI9P4SpKkfZlqaFwBHAcs
-BXYAn52xEU1BVV1ZVcuravnChQsHORRJelWbUmhU1VNV9WJVvQR8gd6cA8B24Ji+TY9ute2tPb4+
-pk+S+cChwDP72JckaUCmFBptjmLUe4HRK6s2AmvbFVHH0pvwvreqdgC7k6xs8xVnAbf29Rm9Mup0
-4K4273EHcEqSBe301ymtJkkakPmTbZDkeuBdwBFJttG7ouldSZYCBTwOfBigqrYmuQl4CNgDnF9V
-L7ZdnUfvSqyDgdvbAnAVcF2SYXoT7mvbvnYmuRi4r213UVV1nZCXJL0CJg2NqjpzgvJV+9h+PbB+
-gvoQcNIE9eeAM/ayrw3AhsnGKEmaHd4RLknqzNCQJHVmaEiSOjM0JEmdGRqSpM4MDUlSZ4aGJKkz
-Q0OS1JmhIUnqzNCQJHVmaEiSOjM0JEmdGRqSpM4MDUlSZ4aGJKkzQ0OS1JmhIUnqbNLQSLIhydNJ
-Huyr/WmS7yV5IMlXk7yx1Rcn+bskm9vy+b4+y5JsSTKc5LL2rHDa88RvbPV7kizu67MuySNtWYck
-aaC6HGlcDawZV9sEnFRVbwX+Crigb92jVbW0LR/pq18BnAMsacvoPs8GdlXV8cClwCUASQ6j9zzy
-k4EVwIVJFvwM302SNMMmDY2q+hawc1ztf1TVnvb2buDofe0jyVHAIVV1d1UVcC1wWlt9KnBNa98M
-rGpHIauBTVW1s6p20Quq8eElSZpFMzGn8SHg9r73x7ZTU99M8o5WWwRs69tmW6uNrnsSoAXRs8Dh
-/fUJ+oyR5NwkQ0mGRkZGpvt9JEl7Ma3QSPKHwB7gS620A3hzVS0FPgl8Ockh0xvi5KrqyqpaXlXL
-Fy5c+Ep/nCTNWVMOjSQfBP458C/aKSeq6vmqeqa17wceBd4CbGfsKayjW432ekzb53zgUOCZ/voE
-fSRJAzCl0EiyBvg3wHuq6sd99YVJ5rX2cfQmvL9fVTuA3UlWtvmKs4BbW7eNwOiVUacDd7UQugM4
-JcmCNgF+SqtJkgZk/mQbJLkeeBdwRJJt9K5ougA4CNjUrpy9u10p9U7goiQvAC8BH6mq0Un08+hd
-iXUwvTmQ0XmQq4DrkgzTm3BfC1BVO5NcDNzXtruob1+SpAGYNDSq6swJylftZdtbgFv2sm4IOGmC
-+nPAGXvpswHYMNkYJUmzwzvCJUmdGRqSpM4MDUlSZ4aGJKkzQ0OS1JmhIUnqzNCQJHVmaEiSOjM0
-JEmdGRqSpM4MDUlSZ4aGJKkzQ0OS1JmhIUnqzNCQJHVmaEiSOjM0JEmdTRoaSTYkeTrJg321w5Js
-SvJIe13Qt+6CJMNJHk6yuq++LMmWtu6y9qxwkhyU5MZWvyfJ4r4+69pnPJJk9DnikqQB6XKkcTWw
-Zlzt08CdVbUEuLO9J8kJ9J7xfWLrc3mSea3PFcA5wJK2jO7zbGBXVR0PXApc0vZ1GL3nkZ8MrAAu
-7A8nSdLsmzQ0qupbwM5x5VOBa1r7GuC0vvoNVfV8VT0GDAMrkhwFHFJVd1dVAdeO6zO6r5uBVe0o
-ZDWwqap2VtUuYBMvDy9J0iya6pzGkVW1o7V/ABzZ2ouAJ/u229Zqi1p7fH1Mn6raAzwLHL6Pfb1M
-knOTDCUZGhkZmeJXkiRNZtoT4e3IoWZgLNMZw5VVtbyqli9cuHCQQ5GkV7WphsZT7ZQT7fXpVt8O
-HNO33dGttr21x9fH9EkyHzgUeGYf+5IkDchUQ2MjMHo10zrg1r762nZF1LH0JrzvbaeydidZ2eYr
-zhrXZ3RfpwN3taOXO4BTkixoE+CntJokaUDmT7ZBkuuBdwFHJNlG74qmPwZuSnI28ATwPoCq2prk
-JuAhYA9wflW92HZ1Hr0rsQ4Gbm8LwFXAdUmG6U24r2372pnkYuC+tt1FVTV+Ql6SNIsmDY2qOnMv
-q1btZfv1wPoJ6kPASRPUnwPO2Mu+NgAbJhujJGl2eEe4JKkzQ0OS1JmhIUnqzNCQJHVmaEiSOjM0
-JEmdGRqSpM4MDUlSZ4aGJKkzQ0OS1JmhIUnqzNCQJHVmaEiSOjM0JEmdGRqSpM4MDUlSZ4aGJKkz
-Q0OS1NmUQyPJLyfZ3LfsTvKJJJ9Jsr2v/u6+PhckGU7ycJLVffVlSba0dZclSasflOTGVr8nyeLp
-fFlJ0vRMOTSq6uGqWlpVS4FlwI+Br7bVl46uq6rbAJKcAKwFTgTWAJcnmde2vwI4B1jSljWtfjaw
-q6qOBy4FLpnqeCVJ0zdTp6dWAY9W1RP72OZU4Iaqer6qHgOGgRVJjgIOqaq7q6qAa4HT+vpc09o3
-A6tGj0IkSbNvpkJjLXB93/uPJnkgyYYkC1ptEfBk3zbbWm1Ra4+vj+lTVXuAZ4HDx394knOTDCUZ
-GhkZmYnvI0mawLRDI8nPAe8B/msrXQEcBywFdgCfne5nTKaqrqyq5VW1fOHCha/0x0nSnDUTRxq/
-CXynqp4CqKqnqurFqnoJ+AKwom23HTimr9/Rrba9tcfXx/RJMh84FHhmBsYsSZqCmQiNM+k7NdXm
-KEa9F3iwtTcCa9sVUcfSm/C+t6p2ALuTrGzzFWcBt/b1WdfapwN3tXkPSdIAzJ9O5ySvB/4Z8OG+
-8p8kWQoU8PjouqramuQm4CFgD3B+Vb3Y+pwHXA0cDNzeFoCrgOuSDAM76c2dSJIGZFqhUVV/y7iJ
-6ar6wD62Xw+sn6A+BJw0Qf054IzpjFGSNHO8I1yS1JmhIUnqzNCQJHVmaEiSOjM0JEmdGRqSpM4M
-DUlSZ4aGJKkzQ0OS1JmhIUnqzNCQJHVmaEiSOjM0JEmdGRqSpM4MDUlSZ4aGJKkzQ0OS1Nm0QiPJ
-40m2JNmcZKjVDkuyKckj7XVB3/YXJBlO8nCS1X31ZW0/w0kua88Kpz1P/MZWvyfJ4umMV5I0PTNx
-pPHrVbW0qpa3958G7qyqJcCd7T1JTqD3jO8TgTXA5UnmtT5XAOcAS9qyptXPBnZV1fHApcAlMzBe
-SdIUvRKnp04Frmnta4DT+uo3VNXzVfUYMAysSHIUcEhV3V1VBVw7rs/ovm4GVo0ehUiSZt90Q6OA
-/5nk/iTnttqRVbWjtX8AHNnai4An+/pua7VFrT2+PqZPVe0BngUOHz+IJOcmGUoyNDIyMs2vJEna
-m/nT7P9Pq2p7kjcBm5J8r39lVVWSmuZnTKqqrgSuBFi+fPkr/nmSNFdN60ijqra316eBrwIrgKfa
-KSfa69Nt8+3AMX3dj2617a09vj6mT5L5wKHAM9MZsyRp6qYcGklen+QXRtvAKcCDwEZgXdtsHXBr
-a28E1rYroo6lN+F9bzuVtTvJyjZfcda4PqP7Oh24q817SJIGYDqnp44EvtrmpecDX66qrye5D7gp
-ydnAE8D7AKpqa5KbgIeAPcD5VfVi29d5wNXAwcDtbQG4CrguyTCwk97VV5KkAZlyaFTV94F/PEH9
-GWDVXvqsB9ZPUB8CTpqg/hxwxlTHKEmaWd4RLknqzNCQJHVmaEiSOjM0JEmdGRqSpM4MDUlSZ4aG
-JKkzQ0OS1JmhIUnqzNCQJHVmaEiSOjM0JEmdGRqSpM4MDUlSZ4aGJKkzQ0OS1JmhIUnqbDrPCD8m
-yTeSPJRka5KPt/pnkmxPsrkt7+7rc0GS4SQPJ1ndV1+WZEtbd1l7VjjteeI3tvo9SRZP/atKkqZr
-Okcae4BPVdUJwErg/CQntHWXVtXSttwG0NatBU4E1gCXJ5nXtr8COAdY0pY1rX42sKuqjgcuBS6Z
-xnglSdM05dCoqh1V9Z3W/hHwXWDRPrqcCtxQVc9X1WPAMLAiyVHAIVV1d1UVcC1wWl+fa1r7ZmDV
-6FGIJGn2zcicRjtt9Dbgnlb6aJIHkmxIsqDVFgFP9nXb1mqLWnt8fUyfqtoDPAscPsHnn5tkKMnQ
-yMjITHwlSdIEph0aSd4A3AJ8oqp20zvVdBywFNgBfHa6nzGZqrqyqpZX1fKFCxe+0h8nSXPWtEIj
-yWvpBcaXquorAFX1VFW9WFUvAV8AVrTNtwPH9HU/utW2t/b4+pg+SeYDhwLPTGfMkqSpm87VUwGu
-Ar5bVZ/rqx/Vt9l7gQdbeyOwtl0RdSy9Ce97q2oHsDvJyrbPs4Bb+/qsa+3TgbvavIckaQDmT6Pv
-rwEfALYk2dxqfwCcmWQpUMDjwIcBqmprkpuAh+hdeXV+Vb3Y+p0HXA0cDNzeFuiF0nVJhoGd9K6+
-kiQNyJRDo6r+EpjoSqbb9tFnPbB+gvoQcNIE9eeAM6Y6RknSzPKOcElSZ4aGJKkzQ0OS1JmhIUnq
-zNCQJHVmaEiSOjM0JEmdGRqSpM4MDUlSZ4aGJKkzQ0OS1JmhIUnqzNCQJHVmaEiSOjM0JEmdGRqS
-pM4MDUlSZwdEaCRZk+ThJMNJPj3o8UjSXLXfh0aSecB/Bn4TOIHeM8hPGOyoJGlu2u9DA1gBDFfV
-96vq74EbgFMHPCZJmpPmD3oAHSwCnux7vw04uX+DJOcC57a3f5Pk4Vka21xwBPDDQQ9iMrlk0CPQ
-gOz3f58H0N/mL3XZ6EAIjUlV1ZXAlYMex6tRkqGqWj7ocUgT8e9z9h0Ip6e2A8f0vT+61SRJs+xA
-CI37gCVJjk3yc8BaYOOAxyRJc9J+f3qqqvYk+ZfAHcA8YENVbR3wsOYST/tpf+bf5yxLVQ16DJKk
-A8SBcHpKkrSfMDQkSZ0ZGpKkzgwNSVJnhoakA0qSg5P88qDHMVcZGhojyVuS3Jnkwfb+rUn+7aDH
-JQEk+W1gM/D19n5pEu/bmkWGhsb7AnAB8AJAVT1A74ZKaX/wGXo/YvrXAFW1GTh2kAOaawwNjfe6
-qrp3XG3PQEYivdwLVfXsuJo3m82i/f6OcM26Hyb5h7R/iElOB3YMdkjST2xN8rvAvCRLgI8B3x7w
-mOYU7wjXGEmOo/fTDP8E2AU8BvxeVT0+yHFJAEleB/whcAoQej8vdHFVPTfQgc0hhoYmlOT1wGuq
-6keDHouk/YehIQCSfHJf66vqc7M1Fmm8JP+dfcxdVNV7ZnE4c5pzGhr1C4MegLQPfzboAajHIw1J
-UmceaWiMJD8PnA2cCPz8aL2qPjSwQUlNu2Lqj4ATGPv3edzABjXHeJ+GxrsO+AfAauCb9B6v62S4
-9hf/BbiC3r1Dvw5cC3xxoCOaYzw9pTGS/J+qeluSB6rqrUleC/yvqlo56LFJSe6vqmVJtlTVr/TX
-Bj22ucLTUxrvhfb610lOAn4AvGmA45H6PZ/kNcAj7THQ24E3DHhMc4qnpzTelUkWAP8O2Ag8BPzJ
-YIck/cTHgdfRuxN8GfB7wFkDHdEc4+kpSQeMJMvp3RH+S8BrW7mq6q2DG9XcYmhojCRvpPc/t8X0
-nb6sqo8NakzSqCQPA/8a2AK8NFqvqicGNqg5xjkNjXcbcDfj/lFK+4mRqvL5GQPkkYbGSPKdqvrV
-QY9DmkiSVcCZwJ3A86P1qvrKwAY1xxgaGiPJvwL+BvgaY/9R7hzYoKQmyReBfwRs5adHwuXNp7PH
-0NAYSc4H1tN7MtroH0d5x632B0keriqfDz5AzmlovE8Bx1fVDwc9EGkC305yQlU9NOiBzFWGhsYb
-Bn486EFIe7ES2JzkMXqnT4OX3M4qQ0Pj/S29f5TfYOychpfcan+wZtADmOsMDY3339oi7Xe8H2Pw
-nAjXyyQ5GHhzVT086LFI2r/421MaI8lvA5uBr7f3S5N4M5UkwNDQy30GWEHvkluqajPg5baSAEND
-L/dCVT07rubPiUgCnAjXy21N8rvAvPZozY8B3x7wmCTtJzzSEABJrmvNR+k9H/x54HpgN/CJQY1L
-0v7Fq6cEQJKHgN8Abqf37OUx/O0pSeDpKf3U5+n9cuhxwFBfPfR+g8rJcEkeaWisJFdU1e8PehyS
-9k+GhiSpMyfCJUmdGRqSpM4MDUlSZ4aGJKkzQ0OaQUlen+QvkvzfJA8meX+SZUm+meT+JHckOSrJ
-/CT3JXlX6/dHSdYPePjSpLxPQ5pZa4D/V1W/BZDkUHo3TJ5aVSNJ3g+sr6oPJfkgcHOSj7Z+Jw9q
-0FJXhoY0s7YAn01yCfA1YBdwErApCcA8YAdAVW1tP9/yNeDtVfX3gxmy1J2hIc2gqvqrJL8KvBv4
-98BdwNaqevteuvwKvZ+hf9MsDVGaFuc0pBmU5BeBH1fVF4E/pXfKaWGSt7f1r01yYmv/DnAY8E7g
-z5O8cUDDljrzjnBpBiVZTS8sXgJeAH4f2ANcBhxK7+j+PwJfpfeT86uq6skkHwOWVdW6gQxc6sjQ
-kCR15ukpSVJnhoYkqTNDQ5LUmaEhSerM0JAkdWZoSJI6MzQkSZ39f8jQx4KVhsufAAAAAElFTkSu
+<img src="data:image/png;base64,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
 QmCC
 "
 >
@@ -13163,14 +13588,311 @@ QmCC
 
 </div>
 
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Steps Histogram</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Steps**&#39;</span><span class="p">)</span>
+<span class="n">n</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+    <span class="nb">list</span><span class="p">(</span><span class="n">bmi_steps</span><span class="p">[</span><span class="s1">&#39;steps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="n">bins</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Steps</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Read users data</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../data/filtered/users_filter.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">users</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[32]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Users sex Histogram</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Users sex**&#39;</span><span class="p">)</span>
+<span class="c1"># Users per sex</span>
+<span class="n">users</span> <span class="o">=</span> <span class="n">users</span><span class="p">[</span><span class="n">users</span><span class="o">.</span><span class="n">user_id</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">bmi_steps</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">])]</span>
+<span class="n">users_sex</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;sex&#39;</span><span class="p">)[</span><span class="s1">&#39;user_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">users_sex</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">users_sex</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<p><strong>Users sex</strong></p>
+
+</div>
+
+</div>
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+Ovb/AWi8oQyfuswtAAAAAElFTkSuQmCC
+"
+>
+</div>
+
+</div>
+
 <div class="output_area">
 <div class="prompt"></div>
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>sex
-female    180965
-male      197507
-dtype: int64
+female    6004
+male      7500
+Name: user_id, dtype: int64
 </pre>
 </div>
 </div>
@@ -13181,171 +13903,12 @@ dtype: int64
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Users height Histogram</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Users height distribution**&#39;</span><span class="p">)</span>
-<span class="n">n</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
-    <span class="nb">list</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;height&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="n">bins</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-<div class="output_markdown rendered_html output_subarea ">
-<p><strong>Users height distribution</strong></p>
-
-</div>
-
-</div>
-
-<div class="output_area">
-<div class="prompt"></div>
-
-
-
-<div class="output_png output_subarea ">
-<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYcAAAD8CAYAAACcjGjIAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz
-AAALEgAACxIB0t1+/AAAGEtJREFUeJzt3X+s3fV93/HnK3aSkqZQftx4lm1mbzidACkkeMhb03aN
-m0LDVLMNkCN1WKuFt8KyJOrWmW5qMk2WoOvKhjaYvJJhaBZwaDK8pnR1TLJoUjG5EBLHgMtNwMWO
-f9UQ3HXCqcl7f5zPVY7v9zr3XHPtcy9+PqSj8znv7/fz/X4+suHl749zvqkqJEnq95ZhD0CSNPsY
-DpKkDsNBktRhOEiSOgwHSVKH4SBJ6jAcJEkdhoMkqcNwkCR1zB/2AE7VRRddVEuXLh32MCRpTnny
-ySf/rKpGplpvzobD0qVLGR0dHfYwJGlOSbJnkPU8rSRJ6jAcJEkdhoMkqcNwkCR1GA6SpA7DQZLU
-YThIkjoMB0lSh+EgSeqYs9+QlqaydMMXhrLfF2+/dij7lWaSRw6SpA7DQZLUYThIkjoMB0lSh+Eg
-SeowHCRJHYaDJKnDcJAkdQwUDkk+nmRXkm8m+UySH0lyQZJtSZ5v7+f3rX9bkrEku5Nc3Ve/MsnO
-tuyuJGn1tyd5qNV3JFk60xOVJA1uynBIsgj4Z8CKqrocmAesATYA26tqObC9fSbJpW35ZcA1wN1J
-5rXN3QPcDCxvr2tafR3wSlVdAtwJ3DEjs5MknZJBTyvNB85JMh94B/AdYDWwuS3fDFzX2quBB6vq
-WFW9AIwBVyVZCJxbVY9XVQH3T+gzvq2HgVXjRxWSpDNvynCoqn3AbwF/CuwHXq2qPwIWVNX+ttoB
-YEFrLwJe6tvE3lZb1NoT6yf0qarjwKvAhacwH0nSDJjyh/fatYTVwDLgu8Bnk/xS/zpVVUnq9Azx
-hLGsB9YDXHzxxad7d9IpGdYP/oE/+qeZM8hppZ8DXqiqw1X1l8DngL8NHGynimjvh9r6+4Alff0X
-t9q+1p5YP6FPO3V1HnBk4kCqalNVraiqFSMjI4PNUJI0bYOEw58CK5O8o10HWAU8C2wF1rZ11gKP
-tPZWYE27A2kZvQvPT7RTUEeTrGzbuWlCn/FtXQ881q5LSJKGYMrTSlW1I8nDwFPAceBrwCbgncCW
-JOuAPcCNbf1dSbYAz7T1b62q19vmbgHuA84BHm0vgHuBB5KMAS/Tu9tJkjQkAz3sp6o+AXxiQvkY
-vaOIydbfCGycpD4KXD5J/TXghkHGIkk6/fyGtCSpw3CQJHUYDpKkDsNBktRhOEiSOgwHSVKH4SBJ
-6jAcJEkdhoMkqcNwkCR1GA6SpA7DQZLUYThIkjoMB0lSh+EgSeowHCRJHVOGQ5KfSPJ03+toko8l
-uSDJtiTPt/fz+/rclmQsye4kV/fVr0yysy27qz0ulPZI0YdafUeSpadjspKkwUwZDlW1u6quqKor
-gCuB/wd8HtgAbK+q5cD29pkkl9J7zOdlwDXA3Unmtc3dA9xM77nSy9tygHXAK1V1CXAncMfMTE+S
-dCqme1ppFfCtqtoDrAY2t/pm4LrWXg08WFXHquoFYAy4KslC4NyqeryqCrh/Qp/xbT0MrBo/qpAk
-nXnTDYc1wGdae0FV7W/tA8CC1l4EvNTXZ2+rLWrtifUT+lTVceBV4MKJO0+yPsloktHDhw9Pc+iS
-pEENHA5J3gb8IvDZicvakUDN4LgmVVWbqmpFVa0YGRk53buTpLPWdI4cfgF4qqoOts8H26ki2vuh
-Vt8HLOnrt7jV9rX2xPoJfZLMB84DjkxjbJKkGTSdcPgwPzilBLAVWNvaa4FH+upr2h1Iy+hdeH6i
-nYI6mmRlu55w04Q+49u6HnisHY1IkoZg/iArJflR4IPAP+4r3w5sSbIO2APcCFBVu5JsAZ4BjgO3
-VtXrrc8twH3AOcCj7QVwL/BAkjHgZXrXNiRJQzJQOFTVXzDhAnFVHaF399Jk628ENk5SHwUun6T+
-GnDDIGORJJ1+fkNaktRhOEiSOgwHSVKH4SBJ6jAcJEkdhoMkqcNwkCR1GA6SpA7DQZLUMdA3pCXN
-DUs3fGEo+33x9muHsl+dPh45SJI6DAdJUofhIEnqMBwkSR2GgySpY6BwSPLjSR5O8lySZ5P8rSQX
-JNmW5Pn2fn7f+rclGUuyO8nVffUrk+xsy+5qT4SjPTXuoVbfkWTpTE9UkjS4QY8c/iPwh1X1N4D3
-AM8CG4DtVbUc2N4+k+RSek9yuwy4Brg7yby2nXuAm+k9OnR5Ww6wDnilqi4B7gTueIPzkiS9AVOG
-Q5LzgJ+m9yhPqup7VfVdYDWwua22GbiutVcDD1bVsap6ARgDrkqyEDi3qh5vz4e+f0Kf8W09DKwa
-P6qQJJ15gxw5LAMOA/8tydeS/E57pvSCqtrf1jkALGjtRcBLff33ttqi1p5YP6FPVR0HXmXCY0kB
-kqxPMppk9PDhw4PMT5J0CgYJh/nA+4B7quq9wF/QTiGNa0cCNfPDO1FVbaqqFVW1YmRk5HTvTpLO
-WoOEw15gb1XtaJ8fphcWB9upItr7obZ8H7Ckr//iVtvX2hPrJ/RJMh84Dzgy3clIkmbGlOFQVQeA
-l5L8RCutAp4BtgJrW20t8EhrbwXWtDuQltG78PxEOwV1NMnKdj3hpgl9xrd1PfBYOxqRJA3BoD+8
-9xHg00neBnwb+Ef0gmVLknXAHuBGgKralWQLvQA5DtxaVa+37dwC3AecAzzaXtC72P1AkjHgZXp3
-O0mShmSgcKiqp4EVkyxadZL1NwIbJ6mPApdPUn8NuGGQsUiSTj9/slun3bB+RlrSqfPnMyRJHYaD
-JKnDcJAkdRgOkqQOw0GS1GE4SJI6DAdJUofhIEnqMBwkSR2GgySpw3CQJHUYDpKkDsNBktRhOEiS
-OgYKhyQvJtmZ5Okko612QZJtSZ5v7+f3rX9bkrEku5Nc3Ve/sm1nLMld7YlwtKfGPdTqO5Isndlp
-SpKmYzpHDj9bVVdU1fhDfzYA26tqObC9fSbJpfSe5HYZcA1wd5J5rc89wM30Hh26vC0HWAe8UlWX
-AHcCd5z6lCRJb9QbOa20Gtjc2puB6/rqD1bVsap6ARgDrkqyEDi3qh5vz4e+f0Kf8W09DKwaP6qQ
-JJ15g4ZDAV9M8mSS9a22oKr2t/YBYEFrLwJe6uu7t9UWtfbE+gl9quo48Cpw4TTmIUmaQYM+JvT9
-VbUvybuAbUme619YVZWkZn54J2rBtB7g4osvPt27k6Sz1kBHDlW1r70fAj4PXAUcbKeKaO+H2ur7
-gCV93Re32r7Wnlg/oU+S+cB5wJFJxrGpqlZU1YqRkZFBhi5JOgVThkOSH03yY+Nt4OeBbwJbgbVt
-tbXAI629FVjT7kBaRu/C8xPtFNTRJCvb9YSbJvQZ39b1wGPtuoQkaQgGOa20APh8uz48H/jvVfWH
-Sb4KbEmyDtgD3AhQVbuSbAGeAY4Dt1bV621btwD3AecAj7YXwL3AA0nGgJfp3e0kSRqSKcOhqr4N
-vGeS+hFg1Un6bAQ2TlIfBS6fpP4acMMA45UknQF+Q1qS1GE4SJI6DAdJUofhIEnqMBwkSR2GgySp
-w3CQJHUYDpKkDsNBktRhOEiSOgwHSVKH4SBJ6jAcJEkdhoMkqcNwkCR1DBwOSeYl+VqS32+fL0iy
-Lcnz7f38vnVvSzKWZHeSq/vqVybZ2Zbd1Z4IR3tq3EOtviPJ0pmboiRpuqZz5PBR4Nm+zxuA7VW1
-HNjePpPkUnpPcrsMuAa4O8m81uce4GZ6jw5d3pYDrANeqapLgDuBO05pNpKkGTFQOCRZDFwL/E5f
-eTWwubU3A9f11R+sqmNV9QIwBlyVZCFwblU93p4Pff+EPuPbehhYNX5UIUk68wY9cvgPwK8B3++r
-Laiq/a19gN6zpgEWAS/1rbe31Ra19sT6CX2q6jjwKnDhgGOTJM2wKcMhyd8FDlXVkydbpx0J1EwO
-7CRjWZ9kNMno4cOHT/fuJOmsNciRw08Cv5jkReBB4ANJfhc42E4V0d4PtfX3AUv6+i9utX2tPbF+
-Qp8k84HzgCMTB1JVm6pqRVWtGBkZGWiCkqTpmzIcquq2qlpcVUvpXWh+rKp+CdgKrG2rrQUeae2t
-wJp2B9Iyeheen2inoI4mWdmuJ9w0oc/4tq5v+zjtRyKSpMnNfwN9bwe2JFkH7AFuBKiqXUm2AM8A
-x4Fbq+r11ucW4D7gHODR9gK4F3ggyRjwMr0QkiQNybTCoaq+DHy5tY8Aq06y3kZg4yT1UeDySeqv
-ATdMZyySpNPHb0hLkjoMB0lSh+EgSeowHCRJHW/kbiVJAmDphi8Mbd8v3n7t0Pb9ZuaRgySpw3CQ
-JHV4WuksMczDfklzj0cOkqQOw0GS1GE4SJI6DAdJUofhIEnqMBwkSR2GgySpY5BnSP9IkieSfD3J
-riT/ptUvSLItyfPt/fy+PrclGUuyO8nVffUrk+xsy+5qT4SjPTXuoVbfkWTpzE9VkjSoQY4cjgEf
-qKr3AFcA1yRZCWwAtlfVcmB7+0ySS+k9ye0y4Brg7iTz2rbuAW6m9+jQ5W05wDrglaq6BLgTuGMG
-5iZJOkWDPEO6qur/to9vba8CVgObW30zcF1rrwYerKpjVfUCMAZclWQhcG5VPd6eD33/hD7j23oY
-WDV+VCFJOvMGuuaQZF6Sp4FDwLaq2gEsqKr9bZUDwILWXgS81Nd9b6stau2J9RP6VNVx4FXgwmnP
-RpI0IwYKh6p6vaquABbTOwq4fMLyonc0cVolWZ9kNMno4cOHT/fuJOmsNa27larqu8CX6F0rONhO
-FdHeD7XV9gFL+rotbrV9rT2xfkKfJPOB84Ajk+x/U1WtqKoVIyMj0xm6JGkaBrlbaSTJj7f2OcAH
-geeArcDattpa4JHW3gqsaXcgLaN34fmJdgrqaJKV7XrCTRP6jG/reuCxdjQiSRqCQX6yeyGwud1x
-9BZgS1X9fpI/BrYkWQfsAW4EqKpdSbYAzwDHgVur6vW2rVuA+4BzgEfbC+Be4IEkY8DL9O52kiQN
-yZThUFXfAN47Sf0IsOokfTYCGyepjwKXT1J/DbhhgPFKks4AvyEtSeowHCRJHYaDJKnDcJAkdRgO
-kqQOw0GS1GE4SJI6DAdJUofhIEnqMBwkSR2GgySpw3CQJHUYDpKkDsNBktRhOEiSOgwHSVLHII8J
-XZLkS0meSbIryUdb/YIk25I8397P7+tzW5KxJLuTXN1XvzLJzrbsrva4UNojRR9q9R1Jls78VCVJ
-gxrkyOE48KtVdSmwErg1yaXABmB7VS0HtrfPtGVrgMuAa4C72yNGAe4Bbqb3XOnlbTnAOuCVqroE
-uBO4YwbmJkk6RVOGQ1Xtr6qnWvvPgWeBRcBqYHNbbTNwXWuvBh6sqmNV9QIwBlyVZCFwblU9XlUF
-3D+hz/i2HgZWjR9VSJLOvGldc2ine94L7AAWVNX+tugAsKC1FwEv9XXb22qLWnti/YQ+VXUceBW4
-cJL9r08ymmT08OHD0xm6JGkaBg6HJO8Efg/4WFUd7V/WjgRqhsfWUVWbqmpFVa0YGRk53buTpLPW
-QOGQ5K30guHTVfW5Vj7YThXR3g+1+j5gSV/3xa22r7Un1k/ok2Q+cB5wZLqTkSTNjEHuVgpwL/Bs
-Vf1236KtwNrWXgs80ldf0+5AWkbvwvMT7RTU0SQr2zZvmtBnfFvXA4+1oxFJ0hDMH2CdnwT+IbAz
-ydOt9uvA7cCWJOuAPcCNAFW1K8kW4Bl6dzrdWlWvt363APcB5wCPthf0wueBJGPAy/TudpIkDcmU
-4VBV/wc42Z1Dq07SZyOwcZL6KHD5JPXXgBumGosk6czwG9KSpA7DQZLUYThIkjoMB0lSh+EgSeow
-HCRJHYaDJKnDcJAkdRgOkqQOw0GS1GE4SJI6DAdJUofhIEnqMBwkSR2GgySpY5AnwX0qyaEk3+yr
-XZBkW5Ln2/v5fctuSzKWZHeSq/vqVybZ2Zbd1Z4GR3ti3EOtviPJ0pmdoiRpugY5crgPuGZCbQOw
-vaqWA9vbZ5JcSu8pbpe1Pncnmdf63APcTO+xocv7trkOeKWqLgHuBO441clIkmbGIE+C+8ok/5pf
-Dfyd1t4MfBn4l63+YFUdA15oj/28KsmLwLlV9ThAkvuB6+g9JnQ18Mm2rYeB/5QkPkNa0iCWbvjC
-UPb74u3XDmW/Z8qpXnNYUFX7W/sAsKC1FwEv9a23t9UWtfbE+gl9quo48Cpw4SmOS5I0A97wBen2
-L/wz8q/8JOuTjCYZPXz48JnYpSSdlU41HA4mWQjQ3g+1+j5gSd96i1ttX2tPrJ/QJ8l84DzgyGQ7
-rapNVbWiqlaMjIyc4tAlSVM51XDYCqxt7bXAI331Ne0OpGX0Ljw/0U5BHU2yst2ldNOEPuPbuh54
-zOsNkjRcU16QTvIZehefL0qyF/gEcDuwJck6YA9wI0BV7UqyBXgGOA7cWlWvt03dQu/Op3PoXYh+
-tNXvBR5oF69fpne3kyRpiAa5W+nDJ1m06iTrbwQ2TlIfBS6fpP4acMNU45AknTl+Q1qS1GE4SJI6
-DAdJUofhIEnqMBwkSR1T3q2kmTWs34GRpOnwyEGS1GE4SJI6DAdJUofhIEnqMBwkSR2GgySpw3CQ
-JHX4PQdJOgXD/M7SmXh+tUcOkqSOWRMOSa5JsjvJWJINwx6PJJ3NZsVppSTzgP8MfBDYC3w1ydaq
-euZ07M+fsJCkH262HDlcBYxV1ber6nvAg8DqIY9Jks5asyUcFgEv9X3e22qSpCGYFaeVBpVkPbC+
-fTyW5JvDHM8Mugj4s2EPYgY5n9nrzTQXeHPNZ+C55I43tJ+/OshKsyUc9gFL+j4vbrUTVNUmYBNA
-ktGqWnFmhnd6vZnmAs5nNnszzQXeXPOZbXOZLaeVvgosT7IsyduANcDWIY9Jks5as+LIoaqOJ/mn
-wP8C5gGfqqpdQx6WJJ21ZkU4AFTVHwB/MI0um07XWIbgzTQXcD6z2ZtpLvDmms+smkuqathjkCTN
-MrPlmoMkaRaZleGQ5FNJDk12q2qSX01SSS7qq93WfnZjd5Krz+xopzbZfJJ8Msm+JE+314f6ls25
-+bT6R5I8l2RXkt/sq8/a+Zzkz+ahvj+XF5M83bds1s4FTjqfK5I83uYzmuSqvmWzdj4nmct7kvxx
-kp1J/meSc/uWzdq5ACRZkuRLSZ5p/418tNUvSLItyfPt/fy+PsObU1XNuhfw08D7gG9OqC+hd9F6
-D3BRq10KfB14O7AM+BYwb9hzmGo+wCeBfz7JunN1Pj8LfBF4e/v8rrkwn5P9Xetb/u+B35gLc/kh
-fzZ/BPxCa38I+PJcmM9J5vJV4Gda+5eBfzsX5tLGuBB4X2v/GPAnbdy/CWxo9Q3AHbNhTrPyyKGq
-vgK8PMmiO4FfA/ovlKwGHqyqY1X1AjBG7+c4Zo0fMp/JzNX5/Apwe1Uda+scavVZPZ8f9meTJMCN
-wGdaaVbPBU46nwLG/4V9HvCd1p7V8znJXN4NfKW1twH/oLVn9VwAqmp/VT3V2n8OPEvvlyBWA5vb
-apuB61p7qHOaleEwmSSrgX1V9fUJi+byT298JMk32uHz+KHkXJ3Pu4GfSrIjyf9O8jdbfa7OB+Cn
-gINV9Xz7PFfn8jHg3yV5Cfgt4LZWn4vz2cUPfnftBn7w5dk5NZckS4H3AjuABVW1vy06ACxo7aHO
-aU6EQ5J3AL8O/MawxzKD7gH+GnAFsJ/e6Yu5bD5wAbAS+BfAlvYv77nsw/zgqGEu+xXg41W1BPg4
-cO+Qx/NG/DJwS5In6Z2a+d6QxzNtSd4J/B7wsao62r+seueTZsUtpHMiHIC/Tu+c29eTvEjv5zWe
-SvJXGPCnN2abqjpYVa9X1feB/8oPDhfn5Hzo/avmc9XzBPB9er8VMyfnk2Q+8PeBh/rKc3IuwFrg
-c639Webw37Wqeq6qfr6qrqQX3N9qi+bEXJK8lV4wfLqqxv9MDiZZ2JYvBMZPyQ51TnMiHKpqZ1W9
-q6qWVtVSev8jel9VHaD3Mxtrkrw9yTJgOfDEEIc7kPG/DM3fA8bvyJiT8wH+B72L0iR5N/A2ej8i
-Nlfn83PAc1W1t682V+fyHeBnWvsDwPhpsjk3nyTvau9vAf418F/aolk/l3YkfS/wbFX9dt+irfQC
-nPb+SF99eHMa9hX8k1zV/wy9Uy1/SS8I1k1Y/iLtbqX2+V/R+xfEbtpdGbPpNdl8gAeAncA36P0l
-WDjH5/M24HfphdxTwAfmwnxO9ncNuA/4J5OsP2vn8kP+bN4PPEnvzpcdwJVzYT4nmctH6d3l8yfA
-7bQv8s72ubTxvZ/eKaNvAE+314eAC4Ht9EL7i8AFs2FOfkNaktQxJ04rSZLOLMNBktRhOEiSOgwH
-SVKH4SBJ6jAcJEkdhoMkqcNwkCR1/H8jUcvHoK8sLAAAAABJRU5ErkJggg==
-"
->
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[33]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Users birthday Histogram</span>
-<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Users birthday distribution**&#39;</span><span class="p">)</span>
-<span class="n">n</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
-    <span class="nb">list</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthday&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="n">bins</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">printmd</span><span class="p">(</span><span class="s1">&#39;**Users birthday**&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">users</span><span class="p">[</span><span class="s1">&#39;birthday&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">),</span> <span class="n">bins</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 
@@ -13362,7 +13925,7 @@ SVKH4SBJ6jAcJEkdhoMkqcNwkCR1/H8jUcvHoK8sLAAAAABJRU5ErkJggg==
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<p><strong>Users birthday distribution</strong></p>
+<p><strong>Users birthday</strong></p>
 
 </div>
 
@@ -13374,124 +13937,97 @@ SVKH4SBJ6jAcJEkdhoMkqcNwkCR1/H8jUcvHoK8sLAAAAABJRU5ErkJggg==
 
 
 <div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
+<img src="data:image/png;base64,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
 AAAAAElFTkSuQmCC
 "
 >
@@ -13499,21 +14035,6 @@ AAAAAElFTkSuQmCC
 
 </div>
 
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Save user filter</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../data/filtered/users_filter.pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">users</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-</pre></div>
-
-</div>
 </div>
 </div>
 

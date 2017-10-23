@@ -8,7 +8,9 @@ Data Exploration:
 
 * [Activities](http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/tracker_filter.html): Visualize statistical profile of activity data, filter noisy steps counts based on threshold, steps _vs_ distance ratio, and steps _vs_ calories ratio.
 
-* [Bmi, Steps correlation](http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps_correlation.html): Visualize correlation between bmi and number of steps considering all users, and inidividual users.
+* [Bmi, Steps](http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps.html): Merge bmi and steps data: each entry consists of user_id, measurement day (year, month, day), bmi, and steps. All steps entries are kept in the merged set. Missing bmi values are interpolated. 
+
+* [Bmi, Steps correlation](http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps_correlation.html): Correlations between bmi and number of steps considering all users, and inidividual users. Cross correlations bewteen number of steps and bmi for individual users.
 
 
 
