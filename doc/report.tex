@@ -1,13 +1,14 @@
 %%This is a template for PH1140 documents for RHUL physics. It is based on IOP journal formatting, but has been brought up-to-date with biblatex by ACK (2017). 
 
 
-\documentclass[12pt]{iopart}
+\documentclass[11pt]{iopart}
 \usepackage{graphicx} %includes figure handling
 \usepackage{textcomp}
 \usepackage{hyperref}
 \usepackage[sorting=none]{biblatex} %includes bibliography tools
 \usepackage{relsize}
 \usepackage{titlesec}
+\usepackage{nth}
 
 
 
@@ -17,7 +18,7 @@
 
 \hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
 \usepackage{helvet}
-\renewcommand{\familydefault}{\sfdefault}
+\renewcommand{\familydefault}{cmr}
 
 \mathchardef\mhyphen="2D
 
@@ -25,12 +26,12 @@
  
 \begin{document}
 
-\title[Renata Rego]{Body Mass Index and Number of Steps Analysis from Activity Tracker Data}
+\title[]{Body Mass Index and Number of Steps Analysis from Activity Tracker Data}
 
 \author{Renata Rego \\ \today} %\today can be changed to a fixed date if desired
 
 \begin{abstract}
-The general goal of this project is to analyze steps and body weight data from users of activity trackers, and to provide coaching insights for users to reach their fitness goals.
+The general goal of this project is to analyze steps and body weight data from users of activity trackers, and to provide insights on how these data could be used to help users on reaching their fitness goals.
 The database used in this project was kindly provided by \href{http://www.medisana.de/}{Medisana\textregistered} and consists on user data stored on their 
 \href{https://cloud.vitadock.com/}{Vitadock} Online Platform.
 
@@ -38,11 +39,10 @@ The database used in this project was kindly provided by \href{http://www.medisa
 
 \section{Introduction}
 
-Obesity and sedentary lifestyle are known to belong together. The question we want to  investigate in this project is how daily steps, measured with a simple, wide accessible equipment, are related to the increase or decrease of the body mass index (vmi), and wether it is possible to provide users insights of how increasing their daily steps could help with decreasing their bmi (i.e, loosing weight). The users population considered in this project doesn't have any restriction of  sex, age, height, etc. Statistics about the available data, such as age range, amount of female and male users, etc. will be presented in the Exploratory Data Analysis.
+Obesity and sedentary lifestyle are known to belong together. The question we want to  investigate in this project is how daily steps, measured with a popular and accessible equipment, are related to the increase or decrease of the body mass index (bmi), and whether it is possible to provide users insights of how increasing their daily steps could help with decreasing their bmi (i.e, loosing weight). The users population considered in this project doesn't have any restriction of  sex, age, height, etc. Further statistics about the available data, such as age range, amount of female and male users, etc. will be presented in the Exploratory Data Analysis.
 
-\section{Methods}
 
-\subsection{Data Acquisition}
+\section{Data Acquisition}
 
 The  Vitadock database schema is available at the \href{https://github.com/Medisana/vitadock-api/wiki/DATA-MODEL-(all-modules)}{Vitadock API repository} .
 The data was kindly provided by \href{http://www.medisana.de/}{Medisana\textregistered} for this project, and due to privacy reasons it cannot be publicly shared.
@@ -62,7 +62,7 @@ This is reasonable because users usually fill in few a required information when
 \\ \\
 Once we read the data from the relational database into json files, we were ready to start the next steps of the project: data exploration and data preparation.
 
-\subsection{Data Exploration and Data Preparation}
+\section{Data Exploration and Data Preparation}
 
 The main data exploration  tasks performed in this project were:
 \begin{itemize}
@@ -70,15 +70,17 @@ The main data exploration  tasks performed in this project were:
 \item Analyzing the statistical profile of data: ex. max, min, mean values, histograms, boxplots, etc.
 \item Analysing the correlations between bmi and number of steps.
 \end{itemize}
-During the  statistical analysis we could also identify outliers and noisy values, and perform the necessary operations to clean the data. \\ \\
+During the  statistical analysis we could also identify some data problems, as for instance:
+outliers and noisy values, duplicated measurements values of steps and weights, inconsistent measurements  (e.g., different weight/bmi values at the same timestamp, inconsistent distance/steps or calories/steps values, etc).  Adderssing  these problems to get a cleaner dataset is part of the ``Data Preparation" activities. \\ \\
 Data Preparation activities includes the data cleaning mentioned above and a couple of other transformations, as for example: 
 \begin{itemize}
-\item converting birthday to age;
-\item filtering weight unit measures:  considering that the great majority of entries are in kilos, we selected only weights measured in kilos;
-\item recomputing bmi, in order to fill missing values or make sure it is coherent with the user's weight and height.
+\item Date transformations: for instance, adding new fields (year, month, day) from timestamps, summarizing users measurements per month, converting birthday to age;
+\item Filtering weight unit measures:  considering that the great majority of the weight measurements  are in kilos, we selected only weights measured in kilos;
+\item Recomputing bmi from user weights and height: in order to fill missing values or fix possible inconsistent values;
+\item Merging bmi and steps datasets to get a bmi value for each steps measurement. When the corresponding bmi in not available at the same day as the steps measurement, interpolation is performed to fill missing data.
 \end{itemize}
-
-The findings of the exploratory data analysis are presented in the links below:
+%\hfill \break
+The findings of the exploratory data analysis and the data preparation process are presented in the links below:
 
 \begin{itemize}
 \item  \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/users_filter.html}{Users}: Visualize statistical profile of user data, filter noisy data.
@@ -87,6 +89,8 @@ The findings of the exploratory data analysis are presented in the links below:
 \item  \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/weights_filter.html}{Weights}: Visualize statistical profile of weight data, filter noisy data, filter by metric (kilos), handle multiple measure at the same timestamp, compute bmi.
 
 \item  \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/tracker_filter.html}{Activities}: Visualize statistical profile of activity data, filter noisy steps counts based on threshold, steps \textit{vs} distance ratio, and steps \textit{vs} calories ratio.
+
+\item \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps.html}{Bmi, Steps}: Merge bmi and steps data: each row of the merged dataset consists of user\_id, measurement day (year, month, day), bmi, and steps. All measurements of steps are kept in the merged dataset. Missing bmi values are interpolated. 
 
 \item  \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps_correlation.html}{Bmi, Steps correlation}: Visualize correlation between bmi and number of steps considering all users, and inidividual users.
 \end{itemize}
@@ -98,29 +102,47 @@ The findings of the exploratory data analysis are presented in the links below:
 
 %\subsubsection{Steps Data}
 
-\subsubsection{BMI Steps Correlation}
+\subsection{Body Mass Index and Steps Correlation}
+In this Section we discuss the correlation between body mass index (bmi) and steps, which is the central topic of this work. 
+We first describe the analysis performed to investigate the relationship between steps and bmi, and then we present a brief summary of our findings.
 
-
-\hfill \break
+%\hfill \break
+ \subsubsection{Analysis Description:}
 
 In order to investigate the relationship between number of steps and bmi value the following analysis were performed:
 
 \begin{itemize}
 \item Correlation Analysis:
-The Pearson correlation coefficient ($corr$) is computed to measure the strength and direction of a linear relationship between two variables, which the following interpretation for the values of $corr$:
+The Pearson correlation coefficient ($corr$) measures the strength and direction of a linear relationship between two variables, in our case the variables are  $steps$ and $bmi$. 
+The direction of the relationship is given by the sign of $corr$: positive sign means that high values of $steps$ are related to high values of $bmi$, while negative sign means that high values of $steps$ are related to low values of $bmi$. The strength is given by the absolute value of $corr$.
+More specifically, in this project he $corr$ values are interpreted as follows :
 
 \begin{list}{$\circ$}{} \smaller
-\item $-1.0$: Perfect negative linear relationship
-\item $-0.7$: Strong negative linear relationship
-\item $-0.3$: Weak negative linear relationship
-\item $ 0.0$: No linear relationship
-\item $ 0.3$: Weak positive linear relationship
-\item $ 0.7$: Strong positive linear relationship
-\item $ 1.0$: Perfect positive linear relationship
+\item $corr = -1.0$: Perfect negative linear relationship
+\item $-1.0 < corr \leq -0.7$: Strong negative linear relationship
+\item $-0.7 < corr \leq -0.3$: Medium negative linear relationship
+\item $-0.3 < corr < 0$: Weak negative linear relationship
+\item $ corr = 0.0 $: No linear relationship
+\item $0 < corr < 0.3$: Weak positive linear relationship
+\item $ 0.3 < corr < 0.7$: Medium positive linear relationship
+\item $ 0.7 < corr < 1.0$: Strong positive linear relationship
+\item $ corr = 1.0$: Perfect positive linear relationship
 \end{list}
+
+The Pearson correlation coefficient is symmetric: $corr(steps,bmi) = corr(bmi,steps)$.
+\\
+
 
 \item Cross correlation Analysis
 
+In the relationship between two time series ($steps(t)$ and $bmi(t)$), the series $bmi(t)$ may be related to past lags of the series $steps(t)$.  
+The cross correlation function (CCF) is helpful to identify lags ($h$) of steps that might be useful predictors of $bmi$, i.e. lags that maximize the correlation between 
+$steps_{t+h}$ and $bmi_{t}$, where $steps_{t+h}$ is the \textit{(t+h)}-th value of $steps$ and $bmi_{t}$ is the $t$-th value of $bmi$ in the time series.
+\\
+In this project we want to investigate if we can predict $bmi$ from previous values of $steps$, therefore we are particularly interested in negative values  of $h$, in other words, we aim to investigate the correlation between $steps$ at a time before t and $bmi$ at time t.   For instance, consider $h = -2$, the CCF value would give the correlation between $steps_{t-2}$ and $bmi_t$.
+\\
+The correlation values are between $-1$ and $1$ and have the same interpretation as discussed above in the topic about \textit{``Correlation Analysis" }.
+\\ 
 
 \item Linear Regression Analysis:
 
@@ -147,6 +169,8 @@ The p-values are interpreted as follows:
  
 \end{itemize}
 
+ \subsubsection{Analysis Results:}
+ 
 A summary of the above mentioned analysis is presented the following.
 
 \begin{enumerate}
@@ -181,7 +205,7 @@ The goal is to investigate if the number of steps of an individual user is corre
 \end{list}
 
 
-\item Cross-correlation analysis: Since the data being investigated are time series, we also computed the cross-correlation between steps and vmi. The maximum lag defined 
+\item Cross-correlation analysis: Since the data being investigated are time series, we also computed the cross-correlation between steps and bmi. The maximum lag defined 
 was 10. For each user we stored the smallest correlation and the lag leading this value. A summary of the correlation values found is given below: 
 \begin{list}{$\circ$}{} 
 \item The median, and mean value of the correlations are respectively  $-0.067$ and $0.078$
@@ -197,25 +221,31 @@ was 10. For each user we stored the smallest correlation and the lag leading thi
 
 \item Linear regression analysis: 
 Data from two users were selected for the linear regression analysis. The user presented with the most negative correlation coefficient, and the second presented the most negative cross correlation coefficient (with a lag of 6).
-In both cases the hypothesis test rejected the null hypothesis with $p\mhyphen value = 5.3160eö{-118} $ for the first user, and $p\mhyphen value =  1.683eö{-30}$ for the second user. The results suggest a relationship bewteen bmi and steps for these users.
+In both cases the hypothesis test rejected the null hypothesis with $p\mhyphen value = 5.3160eö{-118} $ for the first user, and $p\mhyphen value =  1.683eö{-30}$ for the second user. The results suggest a relationship bewteen bmi and steps for these users. For users with a weak negative correlation ($corr$ close to $-0.2$), the null hypothesis was rejected, suggest that there is no linear relationship between steps and bmi.
 
 \end{itemize}
 \end{enumerate}
 
 A more extensive presentation of the relationships between steps and bmi, including charts and bmi predictions from steps can be found \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps_correlation.html}{here}.
 
-\subsection{Clustering}
+\section{Clustering}
 The users where grouped in a total of 36 groups according to their activity lebel, bmi and age.
 \begin{itemize}\smaller
 \item age: $< 30$; $30$ to  $59$, $>=60$ years old
 \item bmi: $<18$ (underweight); $18$ to $25$ (normal); $26$ to $30$ (overweight); $>30$ (obese)
 \item activity level: $<5000$ (low active);  $5000$ to $10000$ (active); $>10000 (very active)$
+\\
+
+We also experimented using \textit{K-means} to cluster users according to their age, bmi, and steps. However we concluded that the above described groups 
+give a more intuitive visualisation of a user's profile. 
+Currently we use standard values to define ranges of age, bmi, and activity level.  Another option would be to define the ranges based on the histograms constructed in the exploratory data analysis .
+
 \end{itemize}
 
 
 
 \subsection{User results report}
-The last phase of the project was to provide a report for a given user showing the characteristics of their group, and how they compare to other users in the same group, through histograms and box plot charts. The bmi/steps evolution curves for a from their group (the one with lowest steps/bmi correlation) is also presented as am insight of how increasing the average number of daily steps in a month, could lead to a weight lost (bmi decrease).
+The last phase of the project was to provide a report for a given user showing the characteristics of their group, and how they compare to other users in the same group, through histograms and box plot charts. The bmi/steps evolution curves for a from their group (the one with lowest steps/bmi correlation) is also presented as an insight of how increasing the average number of daily steps in a month, could lead to a weight lost (bmi decrease).
 
 Take a look at two examples os such reports: 
 \begin{itemize}
@@ -224,9 +254,37 @@ Take a look at two examples os such reports:
 \end{itemize}
 
 
-\section{Conclusion}
+\section{Conclusion and Next Steps}
+Despite it is a common sense that sedentary lifestyle and overweight are highly related, it is not so obvious that we can infer the bmi of a user uniquely from their daily steps.
+First, the activity level of a person is not the variable determining their weight, but a many other variables are involved, as their dietary habits and their personal metabolism.
+Second, the number of daily steps is not enough to measure the activity level of a person, since there are many sports modalities that can not be measured through steps.
 
+Considering the values of the cross-correlation functions between steps and bmi time-series, our analysis show that for  strong to medium negative correlations  ($corr \leq -0.3$) the tests could not reject the null hypothesis, suggesting that there is a linear relationship between steps and bmi. Which means that a relationship where the bmi decreases with an increase of steps exists for a bit more than $8\%$ of our sample users.
+Around $1\%$ of our users present a string to medium positive correlations ($corr \leq -0.3$). As our analysis suggests, for these users there exists a a relationship where the bmi increases with an increase of steps. For most of the samples users however, bmi and steps are only weakly correlated. 
 
+It is worth to notice  that during our ``Data Preparation" activities, we interpolated the missing weight/bmi values, which could have lead to users with practically constant measurements. Therefore, as next steps it is worthy to reconsider our analysis, by restricting the amount of missing values to be interpolated or even discarding all samples with missing values.  
+
+As further development of this work, we would like to analyse the bmi auto-correlation to have an insight on how previous values affects future values of bmi. 
+Next, we would apply lagged regression to predict next bmi values, from previous bmi and number of steps. By lagged regression we mean including 
+(past) lags of bmi and steps to the regression model. This approach could be improved by including the residual error in the regression model, such that the
+ predicted error can be subtracted from the model prediction to enhance performance.
+This can be accomplished by including a number of lagged error values in the linear regression model.
+Note that we have then an autoregression of the residual error time series, which is called a Moving Average (MA) model.
+ 
+A more sophisticated approach are Artificial Neural Networks, in particular the Long-Short-Term Memory (LSTM) Recurrent Networks. A great advantage of this approach is that it can  easily  model problems with multiple inputs.
+
+While we don't expect, and we don't intend to give precise predictions, since the bmi depends on a lot of other variables, we could present the user how their bmi is likely to develop in a near future, giving them the possibility to identify early enough any tendency of a bmi increase, and hopefully take the necessary actions to get/stay fit.
+With a similar purpose we could also create a model to predict the number of steps, warning the user for any tendency of a decrease on their steps counter, and to motivate them to keep active.
+
+Predicting the bmi is not the only thing, a couple of other insights could be provided to the user though their personal data analysis, For examples, what are their most active days of the week? Are they more active on weekend/holidays than on week days? When was their most active period? Etc. 
+
+As for the user clustering, it is interesting to see that the age, bmi and steps distributions differ from one group to another, and to the overall distributions of all samples. 
+As an example one could see that the bmi from 
+ \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps.html}{all users} looks normally distributed, but this is not the case for a specific group of \href{https://github.com/renatalucia/activity-tracker/blob/master/clustering/report_2.pdf}{overweight people}. 
+
+The user reports gives an interesting view if distributions inside the user particular group as well as how the user compares to other people in the same group.
+
+To summarize, this works gives a good overview of the bmi/steps data, and leaves a couple of open possibilities for future developments towards helping users of activity trackers to reach their weight/bmi goals.
 
 \end{document}
 
