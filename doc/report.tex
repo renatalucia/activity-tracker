@@ -173,58 +173,50 @@ The p-values are interpreted as follows:
  
 A summary of the above mentioned analysis is presented the following.
 
-\begin{enumerate}
+\begin{itemize}
 \item Steps and bmi values of all users:
 The goal is to investigate if the number of steps is in general correlated to the bmi of the users. In other words, is it true that users who walks more steps have lower bmi?
 The investigation considered:
 
-\begin{itemize}
-\item Correlation Analysis:
+\begin{list}{$\circ$}{}
+\item \textit{Correlation Analysis}:
  The Pearson correlation coefficient computed was $corr = -0.1068$, indicating a weak but yet negative correlation between the number of steps and the bmi value.
 
-\item Linear Regression Analysis:
-The hypothesis test rejected the null hypothesis with $p\mhyphen value = 0.0 $, suggesting that there is a relationship between steps and bmi.
-\end{itemize}
+\item \textit{Linear Regression Analysis}:
+The hypothesis test rejected the null hypothesis with $p\mhyphen value = 0.0 $, suggesting a relationship between steps and bmi.
+\end{list}
 
 
 \item Steps and bmi values of individual users:
 The goal is to investigate if the number of steps of an individual user is correlated to their own bmi. In other words, is it true that increasing or decreasing the number of steps affects the bmi of a given user? And how is it affected?
 
 \begin{itemize}
-\item Correlation Analysis:  The Pearson correlation coefficient was computed for each user, who had as least 60 bmi/steps registers. A summary of the results is presentes below:
-\begin{list}{$\circ$}{} 
-\item The median, and mean value of the correlations are respectively  $-0.0026$ and $-0.0174$
-\item  Only $3$ users ($0.08\%$) have a strong and $206$ ($5.63\%$) users have a medium negative correlation between steps and bmi.
-\item Yet less users presented strong or medium positive correlation between steps and bmi, $2$ ($0.05\%$) and $144$ ($3.94\%$) users respectively.
-\item $25\%$ of the users has correlation smaller or equals to $-0.119$
-\item The highest negative correlation is: $-0.739$
-\item The highest negative correlation excluding outliers is $-0.4160$
-\item $25\%$ of the users has correlation greater or equals to $0.080$
-\item The highest positive correlation is $0.799$
-\item The highest positive correlation excluding outliers is $0.378$
-\end{list}
+\item \textit{Pearson Correlation Analysis}:  The Pearson correlation coefficient was computed for each user, who had as least 60 bmi/steps registers. The median  and mean correlation values are very close to zero  
+($-0.0026$ and $-0.0174$, respectively). Only 3 users (0.08\%) showed a strong and 206 (5.63\%) a medium negative correlation between steps and bmi.
+Yet less users presented strong or medium positive correlation between steps and bmi, $2$ ($0.05\%$) and $144$ ($3.94\%$), respectively.
+The strongest negative correlation observed was $-0.739$, and the strongest negative positive correlation was $0.799$. 
+Excluding outliers, the strongest negative and positive correlations observed were $-0.4160$ and $0.378$, respectively.
 
 
-\item Cross-correlation analysis: Since the data being investigated are time series, we also computed the cross-correlation between steps and bmi. The maximum lag defined 
-was 10. For each user we stored the smallest correlation and the lag leading this value. A summary of the correlation values found is given below: 
-\begin{list}{$\circ$}{} 
-\item The median, and mean value of the correlations are respectively  $-0.067$ and $0.078$
-\item  $5$ users ($0.14\%$) have a strong and $299$ ($8.18\%$) users have a medium negative correlation between steps and bmi.
-\item Even less users presented strong or medium positive correlation between steps and bmi, $1$ ($0.03\%$) and $43$ ($1.18\%$) users respectively.
-\item $25\%$ of the users has correlation smaller or equals to $-0.170$
-\item The highest negative correlation is: $-0.788$
-\item The highest negative correlation excluding outliers is $-0.445$
-\item $25\%$ of the users has correlation greater or equals to $0.013$
-\item The highest positive correlation is $0.736$
-\item The highest positive correlation excluding outliers is $0.288$
-\end{list}
 
-\item Linear regression analysis: 
-Data from two users were selected for the linear regression analysis. The user presented with the most negative correlation coefficient, and the second presented the most negative cross correlation coefficient (with a lag of 6).
-In both cases the hypothesis test rejected the null hypothesis with $p\mhyphen value = 5.3160eö{-118} $ for the first user, and $p\mhyphen value =  1.683eö{-30}$ for the second user. The results suggest a relationship bewteen bmi and steps for these users. For users with a weak negative correlation ($corr$ close to $-0.2$), the null hypothesis was rejected, suggest that there is no linear relationship between steps and bmi.
+\item \textit{Cross-correlation analysis}: Since the data being investigated are series, we also computed the cross-correlation function (CCF) between steps and bmi. 
+As for the pearson correlation analysis, here only users who had as least 60 bmi/steps registers were considered.
+The maximum lag defined was $h=10$, i.e., considering the set of steps/bmi measurements ($(s_0, b_0)$, $(s_1, b_1)$, $(s_2, b_2)$, ...,  $(s_n, b_n)$), the CCF considers the correlations between $s_{i}$ and $b_{i+10}$, $b_{i+9}$, ..., $b_{i}$, for $i=0$ to $i=n-10$.
+For each user we searched the smallest correlation value from the CCF and the lag leading this value.
+The median  and mean correlation values found were very close to zero  
+($-0.067$ and $-0.078$, respectively). Only 5 users (0.14\%) showed a strong and 299 (8.18\%) a medium negative correlation between steps and bmi.
+Even less users presented strong or medium positive correlation between steps and bmi, $1$ ($0.03\%$) and $43$ ($1.18\%$), respectively.
+The strongest negative correlation observed was $-0.788$, and the strongest negative positive correlation was $0.736$. 
+Excluding outliers, the strongest negative and positive correlations observed were $-0.445$ and $0.288$, respectively.
+
+
+\item \textit{Linear regression analysis}: 
+Hypothesis test were performed for the same users for which we computed the pearson correlations and CCF, i.e., users with more than 60 steps/bmi registers.
+For $25\%$ percent of the users the null hypothesis was rejected and the bmi/steps correlation is negative, suggesting a negative relationship between steps and bmi for these users. 
+The tests failed to reject  the null hypothesis for a total of $39\%$ of the users suggesting a relationship between steps/bmi (including positive and negative relationships) for these users.
 
 \end{itemize}
-\end{enumerate}
+\end{itemize}
 
 A more extensive presentation of the relationships between steps and bmi, including charts and bmi predictions from steps can be found \href{http://htmlpreview.github.io/?https://github.com/renatalucia/activity-tracker/blob/master/data_exploration/bmi_steps_correlation.html}{here}.
 
@@ -233,14 +225,13 @@ The users where grouped in a total of 36 groups according to their activity lebe
 \begin{itemize}\smaller
 \item age: $< 30$; $30$ to  $59$, $>=60$ years old
 \item bmi: $<18$ (underweight); $18$ to $25$ (normal); $26$ to $30$ (overweight); $>30$ (obese)
-\item activity level: $<5000$ (low active);  $5000$ to $10000$ (active); $>10000 (very active)$
-\\
-
+\item activity level: $<5000$ (low active);  $5000$ to $10000$ (active); $>10000$ (very active)
+\end{itemize}
 We also experimented using \textit{K-means} to cluster users according to their age, bmi, and steps. However we concluded that the above described groups 
 give a more intuitive visualisation of a user's profile. 
 Currently we use standard values to define ranges of age, bmi, and activity level.  Another option would be to define the ranges based on the histograms constructed in the exploratory data analysis .
 
-\end{itemize}
+
 
 
 
@@ -259,10 +250,10 @@ Despite it is a common sense that sedentary lifestyle and overweight are highly 
 First, the activity level of a person is not the variable determining their weight, but a many other variables are involved, as their dietary habits and their personal metabolism.
 Second, the number of daily steps is not enough to measure the activity level of a person, since there are many sports modalities that can not be measured through steps.
 
-Considering the values of the cross-correlation functions between steps and bmi time-series, our analysis show that for  strong to medium negative correlations  ($corr \leq -0.3$) the tests could not reject the null hypothesis, suggesting that there is a linear relationship between steps and bmi. Which means that a relationship where the bmi decreases with an increase of steps exists for a bit more than $8\%$ of our sample users.
-Around $1\%$ of our users present a string to medium positive correlations ($corr \leq -0.3$). As our analysis suggests, for these users there exists a a relationship where the bmi increases with an increase of steps. For most of the samples users however, bmi and steps are only weakly correlated. 
+Considering the values of the cross-correlation functions between steps and bmi series, our analysis show that  around $8\%$ of the users
+have strong to medium negative correlations. Another interesting results is that for $25\%$ of the users the steps/bmi correlation is negative and the hypothesis test could  reject the null hypothesis, suggesting a negative relationship between steps and bmi.
 
-It is worth to notice  that during our ``Data Preparation" activities, we interpolated the missing weight/bmi values, which could have lead to users with practically constant measurements. Therefore, as next steps it is worthy to reconsider our analysis, by restricting the amount of missing values to be interpolated or even discarding all samples with missing values.  
+It is worth to notice  that during our ``Data Preparation" activities, we interpolated the missing weight/bmi values, which could have lead to users with practically constant measurements. Therefore, as next steps it is worthy to investigate the bmi/steps relationship only for users without missing  values.
 
 As further development of this work, we would like to analyse the bmi auto-correlation to have an insight on how previous values affects future values of bmi. 
 Next, we would apply lagged regression to predict next bmi values, from previous bmi and number of steps. By lagged regression we mean including 
